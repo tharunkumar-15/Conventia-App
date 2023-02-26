@@ -16,9 +16,9 @@ function ConversationTab({navigation}) {
   // const navigation = useNavigation();
   const {user} = useSelector(state => state.useReducer);
 
-  // useEffect(() => {
-  //   ReadData();
-  // }, []);
+  useEffect(() => {
+    ReadData();
+  }, []);
 
   const ReadData =  () => {
     try {
@@ -76,6 +76,7 @@ function ConversationTab({navigation}) {
         contentContainerStyle={{alignItems: 'center'}}
         showsVerticalScrollIndicator={false}>
         <Text style={styles.welcometext}>Conversation Tab</Text>
+        <Text>{user}</Text>
         {convcards.map((cards, index) => (
           <View style={styles.carddesign} key={index}>
             <Image source={cards.image} style={styles.cardimage} />
