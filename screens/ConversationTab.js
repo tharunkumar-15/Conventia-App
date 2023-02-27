@@ -8,67 +8,59 @@ import {
   Pressable,
 } from 'react-native';
 import CustomButton from '../CustomButton';
-import {auth, db} from '../config';
-import {doc, getDoc} from 'firebase/firestore';
+import {db} from '../config';
+import {doc, getDoc,collection,getDocs} from 'firebase/firestore';
 // import { useNavigation } from '@react-navigation/native';
-import {useSelector, useDispatch} from 'react-redux';
+import {useSelector} from 'react-redux';
+
 function ConversationTab({navigation}) {
   // const navigation = useNavigation();
   const {user} = useSelector(state => state.useReducer);
-
+  const[data,setdata]=useState([])
   useEffect(() => {
     ReadData();
   }, []);
 
-  const ReadData =  () => {
+  // const ReadData =  () => {
+  //   try {
+  //     const docRef = doc(db, "Users",user);
+  //     const docSnap=getDoc(docRef).then((doc)=>{
+  //       console.log(doc.data(),doc.id);
+  //       setdata(doc.data())
+  //     })
+  //     // console.log(docSnap)
+      
+  //   } catch (error){ 
+  //     console.log("Tharun",error);
+  //   }
+  // };
+
+  const ReadData = async () => {
     try {
-      const docRef = doc(db, "Users", user);
-      console.log(docRef)
-      const docSnap =  getDoc(docRef);
-      // console.log(docSnap)
+      const docRef = doc(db, 'Users', user);
+      const docSnap = await getDoc(docRef);
+  
       if (docSnap.exists()) {
-        console.log('Document data:', docSnap.data());
+        const userData = docSnap.data();
+  
+        // Get reference to the "Relatives" subcollection
+        const relativesRef = collection(db, 'Users', user, 'Relatives');
+        const relativesSnap = await getDocs(relativesRef);
+  
+        const relativesData = relativesSnap.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+  
+        console.log(userData, relativesData);
+        setdata(relativesData);
       } else {
-        // doc.data() will be undefined in this case
         console.log('No such document!');
       }
     } catch (error) {
-      console.log(error);
+      console.log('Tharun', error);
     }
   };
-
-  const convcards = [
-    {
-      image: require('../Loginimage.jpg'),
-      name: 'Surya S',
-      relation: 'Friend',
-      Date: '[19-01-23] consume tablets on time',
-    },
-    {
-      image: require('../Loginimage.jpg'),
-      name: 'Surya S',
-      relation: 'Friend',
-      Date: '[19-01-23] consume tablets on time',
-    },
-    {
-      image: require('../Loginimage.jpg'),
-      name: 'Surya S',
-      relation: 'Friend',
-      Date: '[19-01-23] consume tablets on time',
-    },
-    {
-      image: require('../Loginimage.jpg'),
-      name: 'Surya S',
-      relation: 'Friend',
-      Date: '[19-01-23] consume tablets on time',
-    },
-    {
-      image: require('../Loginimage.jpg'),
-      name: 'Surya S',
-      relation: 'Friend',
-      Date: '[19-01-23] consume tablets on time',
-    },
-  ];
 
   return (
     <View style={styles.usercontainer}>
@@ -76,17 +68,14 @@ function ConversationTab({navigation}) {
         contentContainerStyle={{alignItems: 'center'}}
         showsVerticalScrollIndicator={false}>
         <Text style={styles.welcometext}>Conversation Tab</Text>
-        <Text>{user}</Text>
-        {convcards.map((cards, index) => (
+        <Text>{data.Name}</Text>
+        {data.map((cards, index) => (
           <View style={styles.carddesign} key={index}>
-            <Image source={cards.image} style={styles.cardimage} />
+            <Image source={{uri: cards.ImageUri}} style={styles.cardimage} />
             <View style={styles.carddetails}>
-              <Text style={styles.relativedetails}>Name: {cards.name}</Text>
+              <Text style={styles.relativedetails}>Name: {cards.RelativeName}</Text>
               <Text style={styles.relativedetails}>
-                Relation: {cards.relation}
-              </Text>
-              <Text style={styles.relativedetails}>
-                Recordings: {cards.Date}
+                Relation: {cards.Relation}
               </Text>
               <CustomButton
                 buttonTitle="More Info"
