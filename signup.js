@@ -111,7 +111,13 @@ function SignupPage({navigation}) {
             onChangeText={text => setuserdetail({...userdetail,password:text})}
           />
         </View>
-        <CustomButton onPress={() => signup()} buttonTitle="SignUp" />
+        <CustomButton 
+        onPress={() => signup()} 
+        buttonStyle={{
+          backgroundColor:'#f95999',
+          margin:10,
+        }}
+        buttonTitle="SignUp" />
       </ScrollView>
     </View>
   );
@@ -124,7 +130,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#000075',
+    backgroundColor: '#51087E',
     paddingTop: 40,
   },
   appname: {

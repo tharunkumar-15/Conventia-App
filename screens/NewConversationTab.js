@@ -4,7 +4,7 @@ import{
     Text,
     StyleSheet,
 } from 'react-native';
-function NewConverstionTab() {
+function NewConversationTab() {
   return (
     <View style={styles.usercontainer}>
       <Text style={styles.welcometext}>Welcome To New Converstion Tab</Text>
@@ -12,14 +12,14 @@ function NewConverstionTab() {
   );
 }
 
-export default  NewConverstionTab
+export default  NewConversationTab
 
 const styles=StyleSheet.create({
     usercontainer:{
         flex:1,
         justifyContent:'center',
         alignItems:'center',
-        backgroundColor:'#86c4b5',
+        backgroundColor:'#fff',
     },
     welcometext:{
         fontSize:25,

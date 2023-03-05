@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
 } from 'firebase/auth';
-import { auth } from './config';
+import {auth} from './config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -18,22 +18,22 @@ import {
   ActivityIndicator,
 } from 'react-native';
 // import { useNavigation } from '@react-navigation/native';
-import { Dimensions } from 'react-native';
+import {Dimensions} from 'react-native';
 // import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import CustomButton from './CustomButton';
-import { useSelector, useDispatch } from 'react-redux';
-import { setUser } from './Redux/Actions';
+import {useSelector, useDispatch} from 'react-redux';
+import {setUser} from './Redux/Actions';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
-function LoginPage({ navigation }) {
+function LoginPage({navigation}) {
   // const navigation = useNavigation();
-  const { user } = useSelector(state => state.useReducer);
+  const {user} = useSelector(state => state.useReducer);
   const dispatch = useDispatch();
 
   const [email, setemail] = useState(null);
   const [password, setpassword] = useState(null);
-  const[isloaded,setisloaded]=useState(true);
+  const [isloaded, setisloaded] = useState(true);
   useEffect(() => {
     getdata();
     // GoogleSignin.configure({
@@ -62,15 +62,13 @@ function LoginPage({ navigation }) {
     try {
       AsyncStorage.getItem('UserData').then(value => {
         if (value != null) {
-          setisloaded(false)
+          setisloaded(false);
           navigation.reset({
             index: 0,
-            routes: [{ name: 'UserPage' }],
+            routes: [{name: 'UserPage'}],
           });
-        }
-        else
-        {
-          setisloaded(false)
+        } else {
+          setisloaded(false);
         }
       });
     } catch (e) {
@@ -116,70 +114,76 @@ function LoginPage({ navigation }) {
         const errorCode = error.code;
         const errorMessage = error.message;
         alert(errorMessage);
-      })
+      });
   };
 
   return (
     <View style={styles.loginmainpage}>
-      {isloaded?(
+      {isloaded ? (
         <View>
-          <ActivityIndicator size='large' color='#2196f3'/>
+          <ActivityIndicator size="large" color="#ffffff" />
         </View>
-      ):
-        (
-      <ScrollView
-        contentContainerStyle={{ alignItems: 'center' }}
-        showsVerticalScrollIndicator={false}>
-        <View style={styles.appcontainer}>
-          <Text style={styles.appname}>Conventia</Text>
-          <Image
-            source={require('./Loginimage.jpg')}
-            style={styles.loginimage}
-            resizeMode="stretch"
-          />
-        </View>
-        <Text style={styles.loginpagetext}>Login</Text>
-        <View style={styles.iconcontainer}>
-          <View style={styles.icon}>
-            <Fontisto size={25} color={'black'} name="email" />
+      ) : (
+        <ScrollView
+          contentContainerStyle={{alignItems: 'center'}}
+          showsVerticalScrollIndicator={false}>
+          <View style={styles.appcontainer}>
+            <Text style={styles.appname}>Conventia</Text>
+            <Image
+              source={require('./Loginimage.jpg')}
+              style={styles.loginimage}
+              resizeMode="stretch"
+            />
           </View>
-          <TextInput
-            style={styles.emailfield}
-            placeholder="Email"
-            placeholderTextColor="black"
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="email-address"
-            onChangeText={email => setemail(email)}
-          />
-        </View>
-        <View style={styles.iconcontainer}>
-          <View style={styles.icon}>
-            <AntDesign size={25} color={'black'} name="lock" />
+          <Text style={styles.loginpagetext}>Login</Text>
+          <View style={styles.iconcontainer}>
+            <View style={styles.icon}>
+              <Fontisto size={25} color={'black'} name="email" />
+            </View>
+            <TextInput
+              style={styles.emailfield}
+              placeholder="Email"
+              placeholderTextColor="black"
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="email-address"
+              onChangeText={email => setemail(email)}
+            />
           </View>
-          <TextInput
-            style={styles.emailfield}
-            placeholder="Password"
-            placeholderTextColor="black"
-            secureTextEntry={true}
-            autoCapitalize="none"
-            autoCorrect={false}
-            onChangeText={password => setpassword(password)}
+          <View style={styles.iconcontainer}>
+            <View style={styles.icon}>
+              <AntDesign size={25} color={'black'} name="lock" />
+            </View>
+            <TextInput
+              style={styles.emailfield}
+              placeholder="Password"
+              placeholderTextColor="black"
+              secureTextEntry={true}
+              autoCapitalize="none"
+              autoCorrect={false}
+              onChangeText={password => setpassword(password)}
+            />
+          </View>
+          <CustomButton
+            onPress={() => login()}
+            buttonStyle={{
+              backgroundColor: '#f95999',
+              margin: 10,
+            }}
+            buttonTitle="Login"
           />
-        </View>
-        <CustomButton onPress={() => login()} buttonTitle="Login" />
-        <Text style={styles.forgotpassword} onPress={() => forgotpassword()}>
-          Forgot Password?
-        </Text>
-        <Pressable>
-          <Text style={styles.googlebutton}>Sign in with Google</Text>
-        </Pressable>
-        <Text
-          style={styles.register}
-          onPress={() => navigation.navigate('Signpage')}>
-          Dont have an account?Create here
-        </Text>
-      </ScrollView>
+          <Text style={styles.forgotpassword} onPress={() => forgotpassword()}>
+            Forgot Password?
+          </Text>
+          <Pressable>
+            <Text style={styles.googlebutton}>Sign in with Google</Text>
+          </Pressable>
+          <Text
+            style={styles.register}
+            onPress={() => navigation.navigate('Signpage')}>
+            Dont have an account?Create here
+          </Text>
+        </ScrollView>
       )}
     </View>
   );
@@ -192,7 +196,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#000075',
+    backgroundColor: '#51087E',
     paddingTop: 40,
   },
   appname: {

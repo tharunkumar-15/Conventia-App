@@ -20,12 +20,19 @@ function CameraResultTab({navigation}) {
         buttonStyle={{
           width: '50%',
         }}
+        textstyle={{
+          fontSize:16,
+        }}
         onPress={() => navigation.navigate(PreviousConverstionTab)}
       />
       <CustomButton
         buttonTitle="Start Recording a new Conversation"
         buttonStyle={{
           width: '50%',
+          padding:12,
+        }}
+        textstyle={{
+          fontSize:16,
         }}
         onPress={() => navigation.navigate(NewConverstionTab)}
       />
@@ -40,7 +47,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#86c4b5',
+    backgroundColor: '#fff',
   },
   welcometext: {
     fontSize: 25,

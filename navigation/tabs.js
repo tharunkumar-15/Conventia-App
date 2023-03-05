@@ -6,39 +6,40 @@ import CameraTab from '../screens/CameraTab';
 import ConversationTab from '../screens/ConversationTab';
 import UserPage from '../screens/UserPage';
 import UserProfileTab from '../screens/UserProfileTab';
-import { StyleSheet,Text,View,Image,TouchableOpacity } from 'react-native';
+import CameraResultTab from '../screens/CameraResultTab';
+import { StyleSheet,Text,View,Image,TouchableOpacity} from 'react-native';
 
 const Tab = createBottomTabNavigator();
 
-const CustomTabBarButton = ({children, onPress}) => (
-    <TouchableOpacity
-    style={{
-        top:-15,
-        justifyContent:'center',
-        alignItems:'center',
-        ...styles.shadow
-    }}
-    onPress={onPress}
-    >
-        <View style={{
-            width: 70,
-            height: 70,
-            borderRadius: 35,
-            //backgroundColor:'#d9d9d9',
-            backgroundColor:'#ffffff',
-            opacity:9,
-        }}>
-            {children}
-        </View>
-    </TouchableOpacity>
-);
+// const CustomTabBarButton = ({children, onPress}) => (
+//     <TouchableOpacity
+//     style={{
+//         top:-15,
+//         justifyContent:'center',
+//         alignItems:'center',
+//         ...styles.shadow
+//     }}
+//     onPress={onPress}
+//     >
+//         <View style={{
+//             width: 70,
+//             height: 70,
+//             borderRadius: 35,
+//             //backgroundColor:'#9F8BCC',
+//             backgroundColor:'#ffffff',
+//             opacity:9,
+//         }}>
+//             {children}
+//         </View>
+//     </TouchableOpacity>
+// );
 
 const Tabs =() => {
     return(
         <Tab.Navigator screenOptions={{tabBarShowLabel:false, 
             tabBarStyle:{
             elevation:0,
-            backgroundColor:'#041f60',
+            backgroundColor:'#51087E',
             height:60,
              },
             //tabBarIconStyle:{display:"none"},
@@ -55,10 +56,10 @@ const Tabs =() => {
                             style ={{
                                 width:25,
                                 height:25,
-                                tintColor:focused ? '#ffffff' : '#d9d9d9',
+                                tintColor:focused ? '#ffffff' : '#9F8BCC',
                             }}
                         />
-                        <Text style={{color:focused ? '#ffffff' : '#d9d9d9', fontSize: 12}}>Home</Text>
+                        <Text style={{color:focused ? '#ffffff' : '#9F8BCC', fontSize: 12}}>Home</Text>
                     </View>
                 ),
             }} />
@@ -71,15 +72,32 @@ const Tabs =() => {
                             style ={{
                                 width:25,
                                 height:25,
-                                tintColor:focused ? '#ffffff' : '#d9d9d9',
+                                tintColor:focused ? '#ffffff' : '#9F8BCC',
                             }}
                         />
-                        <Text style={{color:focused ? '#ffffff' : '#d9d9d9', fontSize: 12}}>Conversation</Text>
+                        <Text style={{color:focused ? '#ffffff' : '#9F8BCC', fontSize: 12}}>Conversation</Text>
                     </View>
                 ),
             }}/>
 
-            <Tab.Screen name="Camera" component={CameraTab} 
+            <Tab.Screen name="Camera" component={CameraResultTab} options={{
+                tabBarIcon:({focused}) => (
+                    <View style={{alignItems: 'center', justifyContent: 'center', top:5}}>
+                        <Image 
+                            source={require('./camera.png')}  
+                            resizeMode='contain'
+                            style ={{
+                                width:25,
+                                height:25,
+                                tintColor:focused ? '#ffffff' : '#9F8BCC',
+                            }}
+                        />
+                        <Text style={{color:focused ? '#ffffff' : '#9F8BCC', fontSize: 12}}>Camera</Text>
+                    </View>
+                ),
+            }}/>
+
+            {/* <Tab.Screen name="Camera" component={CameraTab} 
                 options={{
                     tabBarIcon: ({focused}) => (
                         <Image
@@ -97,7 +115,7 @@ const Tabs =() => {
                         <CustomTabBarButton {...props} />
                     )
                 }}
-            />
+            /> */}
 
             <Tab.Screen name="Add People" component={AddPeopleTab} options={{
                 tabBarIcon:({focused}) => (
@@ -108,13 +126,15 @@ const Tabs =() => {
                             style ={{
                                 width:25,
                                 height:25,
-                                tintColor:focused ? '#ffffff' : '#d9d9d9',
+                                tintColor:focused ? '#ffffff' : '#9F8BCC',
                             }}
                         />
-                        <Text style={{color:focused ? '#ffffff' : '#d9d9d9', fontSize: 12}}>Add People</Text>
-                    </View>
+                        <Text style={{color:focused ? '#ffffff' : '#9F8BCC', fontSize: 12}}>Add People</Text>
+                    </View> 
                 ),
             }}/>
+
+
             <Tab.Screen name="User Profile" component={UserProfileTab} options={{
                 tabBarIcon:({focused}) => (
                     <View style={{alignItems: 'center', justifyContent: 'center', top:5}}>
@@ -124,10 +144,10 @@ const Tabs =() => {
                             style ={{
                                 width:25,
                                 height:25,
-                                tintColor:focused ? '#ffffff' : '#d9d9d9',
+                                tintColor:focused ? '#ffffff' : '#9F8BCC',
                             }}
                         />
-                        <Text style={{color:focused ? '#ffffff' : '#d9d9d9', fontSize: 12}}>Account</Text>
+                        <Text style={{color:focused ? '#ffffff' : '#9F8BCC', fontSize: 12}}>Account</Text>
                     </View>
                 ),
             }}/>

@@ -8,7 +8,7 @@ function UserPage() {
   return (
     <View style={styles.usercontainer}>
       <Text style={styles.welcometext}>Welcome To Home Tab</Text>
-      <Text>{user}</Text>
+      <Text style={{color:'black'}}>{user}</Text>
     </View>
   );
 }
@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#86c4b5',
+    backgroundColor: '#fff',
   },
   welcometext: {
     fontSize: 25,

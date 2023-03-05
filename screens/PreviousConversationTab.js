@@ -4,100 +4,112 @@ import CustomButton from '../CustomButton';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import ConversationModal from './ConversationModal';
 import {db} from '../config';
-import {doc, getDoc, collection, getDocs} from 'firebase/firestore';
+import {
+  doc,
+  collection,
+  getDocs,
+  deleteDoc,
+  updateDoc,
+} from 'firebase/firestore';
 import {useSelector} from 'react-redux';
+import {format} from 'date-fns';
 
 function PreviousConverstionTab() {
   const [icon, seticon] = useState(false);
-  const [modal, setmodal] = useState(false);
+  const [modalStates, setModalStates] = useState([]);
   const [data, setdata] = useState([]);
   const {user} = useSelector(state => state.useReducer);
-  const modalHandler = () => {
-    setmodal(previousState => !previousState);
-  };
 
-  const iconhandler = () => {
-    seticon(previousState => !previousState);
+  const modalHandler = index => {
+    setModalStates(prevStates => {
+      const newStates = [...prevStates];
+      newStates[index] = !newStates[index];
+      return newStates;
+    });
   };
 
   useEffect(() => {
     ReadData();
   }, []);
 
+  // useEffect(()=>{
+  //     // imporconv();
+  // },[icon])
+
   const ReadData = async () => {
     try {
-      const docRef = doc(db, 'Users', user);
-      const docSnap = await getDoc(docRef);
-    
-      if (docSnap.exists()) {
-        const userData = docSnap.data();
-  
-        // Get reference to the "Relatives" subcollection
-        const relativesRef = collection(db, 'Users', user, 'Relatives');
-        const relativesSnap = await getDocs(relativesRef);
-        console.log("relativesnap:",relativesSnap)
-        const relativesData = relativesSnap.docs.map(async (doc) => {
-          // Get reference to the "RecordedConversation" subcollection
-          console.log(doc.id)
-          const conversationsRef = collection(db, 'Users', user, 'Relatives', "uUvRiipoUTGqRSD6UAUF", 'RecordedConversation');
-          const conversationsSnap = await getDocs(conversationsRef);
-        
-          const conversationsData = conversationsSnap.docs.map((conversationDoc) => ({
-            ...conversationDoc.data(),
-            id: conversationDoc.id,
-          }));
-  
-          console.log('Relative ID:', doc.id, 'Recorded Conversations:', conversationsData);
-          setdata(conversationsData);
-        });
-  
-        console.log('User Data:', userData);
-        console.log('Relatives Data:', relativesData);
-      } 
-      else {
-        console.log('No such document!');
-      }
+      const conversationsRef = collection(
+        db,
+        'Users',
+        user,
+        'Relatives',
+        'uUvRiipoUTGqRSD6UAUF',
+        'RecordedConversation',
+      );
+      const conversationsSnap = await getDocs(conversationsRef);
+      const conversationsData = conversationsSnap.docs.map(conversationDoc => ({
+        ...conversationDoc.data(),
+        id: conversationDoc.id,
+      }));
+      setdata(conversationsData);
+      setModalStates(new Array(conversationsData.length).fill(false));
     } catch (error) {
       console.log('Tharun', error);
     }
   };
-  
-  const infos = [
-    {
-      date: '[19-02-23]',
-      remainder:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus acultrices enim. Proin volutpat sem et nunc commodo, ac vestibulum urnaconsequat. Sed scelerisque, quam vel efficitur pretium, est elit commododio, quis iaculis mi quam id urna.',
-    },
-    {
-      date: '[19-02-23]',
-      remainder:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus acultrices enim. Proin volutpat sem et nunc commodo, ac vestibulum urnaconsequat. Sed scelerisque, quam vel efficitur pretium, est elit commododio, quis iaculis mi quam id urna.',
-    },
-    {
-      date: '[19-02-23]',
-      remainder:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus acultrices enim. Proin volutpat sem et nunc commodo, ac vestibulum urnaconsequat. Sed scelerisque, quam vel efficitur pretium, est elit commododio, quis iaculis mi quam id urna.',
-    },
-    {
-      date: '[19-02-23]',
-      remainder:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus acultrices enim. Proin volutpat sem et nunc commodo, ac vestibulum urnaconsequat. Sed scelerisque, quam vel efficitur pretium, est elit commododio, quis iaculis mi quam id urna.',
-    },
-    {
-      date: '[19-02-23]',
-      remainder:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus acultrices enim. Proin volutpat sem et nunc commodo, ac vestibulum urnaconsequat. Sed scelerisque, quam vel efficitur pretium, est elit commododio, quis iaculis mi quam id urna.',
-    },
-  ];
+
+  const deleterelative = async docid => {
+    try {
+      const conversationRef = doc(
+        db,
+        'Users',
+        user,
+        'Relatives',
+        'uUvRiipoUTGqRSD6UAUF',
+        'RecordedConversation',
+        docid,
+      );
+      await deleteDoc(conversationRef).then(() => {
+        alert('Deleted Data Successfully');
+        setdata(prevData => prevData.filter(item => item.id !== docid));
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const imporconv = async (docid, currentImportantState) => {
+    try {
+      const Imporconv = doc(
+        db,
+        'Users',
+        user,
+        'Relatives',
+        'uUvRiipoUTGqRSD6UAUF',
+        'RecordedConversation',
+        docid,
+      );
+      await updateDoc(Imporconv, {
+        Important: !currentImportantState,
+      });
+      setdata(prevData =>
+        prevData.map(info => {
+          if (info.id === docid) {
+            return {...info, Important: !currentImportantState};
+          } else {
+            return info;
+          }
+        }),
+      );
+    } catch (error) {
+      console.log('Suhas:', error);
+    }
+  };
+
   return (
     <View style={styles.usercontainer}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles.welcometext}>Previous Converstions</Text>
-        {data.map((conversation, index) => (
-          <View key={index}>
-            <Text>{conversation.Summary}</Text>
-          </View>
-        ))}
         <View style={styles.relativedetails}>
           <Image
             source={require('../Loginimage.jpg')}
@@ -109,50 +121,67 @@ function PreviousConverstionTab() {
             <CustomButton
               buttonTitle="Remove Person"
               buttonStyle={{
-                width: '77%',
+                width: '65%',
+                marginLeft: 10,
+              }}
+              textstyle={{
+                fontSize: 15,
               }}
             />
           </View>
         </View>
         <Text style={styles.details}>Recordings</Text>
-        <Text>{data.Summary}</Text>
         <View style={styles.recordingdetails}>
-          {infos.map((info, index) => (
+          {data.map((info, index) => (
             <View key={index} style={styles.cards}>
               <Text style={styles.remaininfo} numberOfLines={2}>
-                {info.date} {info.remainder}
+                {info.SummaryDate?.seconds && (
+                  <Text style={styles.remaininfo} numberOfLines={2}>
+                    {format(
+                      new Date(info.SummaryDate.seconds * 1000),
+                      'MMM d, yyyy h:mm a',
+                    )}
+                    : {info.Summary}
+                  </Text>
+                )}
               </Text>
               <View style={styles.logostyle}>
                 <AntDesign
                   size={25}
-                  color={'black'}
+                  color={'white'}
                   name="delete"
                   style={{marginTop: 15}}
+                  onPress={() => deleterelative(info.id)}
                 />
                 <AntDesign
                   size={25}
-                  color={'black'}
-                  name={icon ? 'star' : 'staro'}
+                  color={'white'}
+                  name={info.Important ? 'star' : 'staro'}
                   style={{marginTop: 15, marginLeft: 20}}
-                  onPress={() => iconhandler()}
+                  onPress={() => imporconv(info.id, info.Important)}
                 />
+
                 <View style={styles.buttonstyles}>
                   <CustomButton
                     buttonTitle="MoreInfo"
                     buttonStyle={{
                       width: '65%',
+                      backgroundColor: '#f95999',
                     }}
-                    onPress={() => modalHandler()}
+                    textstyle={{
+                      fontSize: 15,
+                    }}
+                    onPress={() => modalHandler(index)}
                   />
                 </View>
                 <Modal
-                  visible={modal}
-                  onRequestClose={() => setmodal(false)}
+                  visible={modalStates[index]}
+                  onRequestClose={() => modalHandler(index)}
                   animationType="fade"
                   transparent={true}>
                   <ConversationModal
-                    conversation={info.remainder}
-                    modalhandler={modalHandler}
+                    conversation={info.Summary}
+                    modalhandler={() => modalHandler(index)}
                   />
                 </Modal>
               </View>
@@ -171,7 +200,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#86c4b5',
+    backgroundColor: '#fff',
   },
   welcometext: {
     fontSize: 25,
@@ -179,6 +208,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     paddingBottom: 20,
     paddingTop: 20,
+    textAlign: 'center',
   },
   relativedetails: {
     flex: 1,
@@ -209,7 +239,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cards: {
-    backgroundColor: '#f8f6f3',
+    backgroundColor: '#51087E',
     width: '90%',
     padding: 18,
     marginBottom: 20,
@@ -217,7 +247,7 @@ const styles = StyleSheet.create({
     margin: 5,
   },
   remaininfo: {
-    color: 'black',
+    color: 'white',
     fontWeight: 'bold',
     fontSize: 15,
   },
