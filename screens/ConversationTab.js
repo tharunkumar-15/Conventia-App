@@ -6,19 +6,37 @@ import {
   Image,
   ScrollView,
   Pressable,
+  BackHandler,
 } from 'react-native';
 import CustomButton from '../CustomButton';
 import {db} from '../config';
 import {collection,getDocs} from 'firebase/firestore';
 // import { useNavigation } from '@react-navigation/native';
-import {useSelector} from 'react-redux';
+// import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
+import {setConversationTabScreen} from '../Redux/Actions';
+// import PreviousConverstionTab from './PreviousConversationTab';
 
 function ConversationTab({navigation}) {
   // const navigation = useNavigation();
   const {user} = useSelector(state => state.useReducer);
+  const {conversationScreen} = useSelector(state => state.useReducer);
   const[data,setdata]=useState([])
+  const dispatch = useDispatch();
+
   useEffect(() => {
     ReadData();
+  }, []);
+
+  function handleBackButtonClick() {
+    dispatch(setConversationTabScreen(true))
+    BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+    console.log('Hello')
+    return true;
+  }
+  
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", handleBackButtonClick);
   }, []);
 
   // const ReadData =  () => {
@@ -68,7 +86,7 @@ function ConversationTab({navigation}) {
                   width: '80%',
                   backgroundColor:"#f95999"
                 }}
-                // onPress={() => navigation.navigate('UserProfileTab')}
+                onPress={()=>{dispatch(setConversationTabScreen(false))}}
               />
             </View>
           </View>
