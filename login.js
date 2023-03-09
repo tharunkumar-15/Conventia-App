@@ -11,24 +11,21 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   Pressable,
   Image,
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
 // import { useNavigation } from '@react-navigation/native';
-import {Dimensions} from 'react-native';
 // import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import CustomButton from './CustomButton';
 import {useSelector, useDispatch} from 'react-redux';
 import {setUser} from './Redux/Actions';
+import CustomInput from './CustomInput';
 
-const windowWidth = Dimensions.get('window').width;
-const windowHeight = Dimensions.get('window').height;
 function LoginPage({navigation}) {
   // const navigation = useNavigation();
-  const {user} = useSelector(state => state.useReducer);
+  // const {user} = useSelector(state => state.useReducer);
   const dispatch = useDispatch();
 
   const [email, setemail] = useState(null);
@@ -36,11 +33,6 @@ function LoginPage({navigation}) {
   const [isloaded, setisloaded] = useState(true);
   useEffect(() => {
     getdata();
-    // GoogleSignin.configure({
-    //   webClientId:
-    //     '67422949635-q5vndsjn79ea1mu433u8ftusm4dvhiv0.apps.googleusercontent.com',
-    //   offlineAccess: false,
-    // });
     getuid();
   }, []);
 
@@ -136,39 +128,30 @@ function LoginPage({navigation}) {
             />
           </View>
           <Text style={styles.loginpagetext}>Login</Text>
-          <View style={styles.iconcontainer}>
-            <View style={styles.icon}>
-              <Fontisto size={25} color={'black'} name="email" />
-            </View>
-            <TextInput
-              style={styles.emailfield}
-              placeholder="Email"
-              placeholderTextColor="black"
+            <CustomInput
+              placeholderText={'Email'}
               autoCapitalize="none"
               autoCorrect={false}
-              keyboardType="email-address"
               onChangeText={email => setemail(email)}
+              keyboardType="email-address"
+              Icon={Fontisto}
+              Icontype='email'
             />
-          </View>
-          <View style={styles.iconcontainer}>
-            <View style={styles.icon}>
-              <AntDesign size={25} color={'black'} name="lock" />
-            </View>
-            <TextInput
-              style={styles.emailfield}
-              placeholder="Password"
-              placeholderTextColor="black"
+            <CustomInput
+              placeholderText={'Password'}
               secureTextEntry={true}
               autoCapitalize="none"
               autoCorrect={false}
               onChangeText={password => setpassword(password)}
+              Icon={AntDesign}
+              Icontype='lock'
             />
-          </View>
           <CustomButton
             onPress={() => login()}
             buttonStyle={{
               backgroundColor: '#f95999',
               margin: 10,
+              width:'50%',
             }}
             buttonTitle="Login"
           />
@@ -223,39 +206,10 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center',
   },
-  emailfield: {
-    width: '80%',
-    fontSize: 16,
-    color: 'black',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingLeft: 10,
-  },
   register: {
     color: 'white',
     fontSize: 17,
     margin: 15,
-  },
-  iconcontainer: {
-    marginTop: 10,
-    marginBottom: 20,
-    width: '95%',
-    borderColor: 'black',
-    borderRadius: 3,
-    borderWidth: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    height: windowHeight / 15,
-  },
-  icon: {
-    padding: 10,
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRightColor: 'black',
-    borderRightWidth: 1,
-    width: 60,
   },
   forgotpassword: {
     fontSize: 15,

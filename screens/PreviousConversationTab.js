@@ -43,7 +43,7 @@ function PreviousConverstionTab() {
         'Users',
         user,
         'Relatives',
-        'uUvRiipoUTGqRSD6UAUF',
+        'uZ6QtIFk1dOCYMhgGKYz',
         'RecordedConversation',
       );
       const conversationsSnap = await getDocs(conversationsRef);
@@ -65,7 +65,7 @@ function PreviousConverstionTab() {
         'Users',
         user,
         'Relatives',
-        'uUvRiipoUTGqRSD6UAUF',
+        'uZ6QtIFk1dOCYMhgGKYz',
         'RecordedConversation',
         docid,
       );
@@ -85,7 +85,7 @@ function PreviousConverstionTab() {
         'Users',
         user,
         'Relatives',
-        'uUvRiipoUTGqRSD6UAUF',
+        'uZ6QtIFk1dOCYMhgGKYz',
         'RecordedConversation',
         docid,
       );
@@ -163,7 +163,7 @@ function PreviousConverstionTab() {
 
                 <View style={styles.buttonstyles}>
                   <CustomButton
-                    buttonTitle="MoreInfo"
+                    buttonTitle="More Info"
                     buttonStyle={{
                       width: '65%',
                       backgroundColor: '#f95999',

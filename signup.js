@@ -3,7 +3,6 @@ import {
   StyleSheet,
   View,
   Text,
-  TextInput,
   Image,
   ScrollView,
 } from 'react-native';
@@ -14,24 +13,29 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {Dimensions} from 'react-native';
 import CustomButton from './CustomButton';
-import { doc, setDoc } from "firebase/firestore";
-import { db } from './config';
+import {doc, setDoc} from 'firebase/firestore';
+import {db} from './config';
+import CustomInput from './CustomInput';
 
 const windowHeight = Dimensions.get('window').height;
 
 function SignupPage({navigation}) {
   // const navigation = useNavigation();
   const [userdetail, setuserdetail] = useState({
-    email:"",password:"",name:""
+    email: '',
+    password: '',
+    name: '',
   });
-  
 
   const signup = () => {
     createUserWithEmailAndPassword(auth, userdetail.email, userdetail.password)
-      .then( userCredential => {
-         setDoc(doc(db, "Users", userCredential.user.uid), {
+      .then(userCredential => {
+        setDoc(doc(db, 'Users', userCredential.user.uid), {
           Email: userdetail.email,
           Name: userdetail.name,
+          UserImage:'',
+          Address:'',
+          Caregiverno:'',
         });
         alert('User created successfully');
         navigation.navigate('userloginpage');
@@ -41,7 +45,7 @@ function SignupPage({navigation}) {
         const errorMessage = error.message;
         alert(errorMessage);
       });
-  };  
+  };
   return (
     <View style={styles.loginmainpage}>
       <ScrollView
@@ -56,68 +60,54 @@ function SignupPage({navigation}) {
           />
         </View>
         <Text style={styles.loginpagetext}>SignUp</Text>
-        <View style={styles.iconcontainer}>
-          <View style={styles.icon}>
-            <Fontisto size={25} color={'black'} name="email" />
-          </View>
-          <TextInput
-            style={styles.emailfield}
-            placeholder="Email"
-            placeholderTextColor="black"
+          <CustomInput
+            placeholderText={'Email'}
             autoCapitalize="none"
             autoCorrect={false}
-            keyboardType='email-address'
-            onChangeText={text => setuserdetail({...userdetail,email:text})}
+            keyboardType="email-address"
+            onChangeText={text => setuserdetail({...userdetail, email: text})}
+            Icon={Fontisto}
+            Icontype={'email'}
           />
-        </View>
-        <View style={styles.iconcontainer}>
-          <View style={styles.icon}>
-            <Ionicons size={25} color={'black'} name="ios-person-outline" />
-          </View>
-          <TextInput
-            style={styles.emailfield}
-            placeholder="Name"
-            placeholderTextColor="black"
+          <CustomInput
+            placeholderText={'Name'}
             autoCapitalize="none"
             autoCorrect={false}
-            onChangeText={text => setuserdetail({...userdetail,name:text})}
+            onChangeText={text => setuserdetail({...userdetail, name: text})}
+            Icon={Ionicons}
+            Icontype={'ios-person-outline'}
           />
-        </View>
-        <View style={styles.iconcontainer}>
-          <View style={styles.icon}>
-            <AntDesign size={25} color={'black'} name="lock" />
-          </View>
-          <TextInput
-            style={styles.emailfield}
-            placeholder="Password"
-            placeholderTextColor="black"
+          <CustomInput
+            placeholderText={'Password'}
             secureTextEntry={true}
             autoCapitalize="none"
             autoCorrect={false}
-            onChangeText={text => setuserdetail({...userdetail,password:text})}
+            onChangeText={text =>
+              setuserdetail({...userdetail, password: text})
+            }
+            Icon={AntDesign}
+            Icontype={'lock'}
           />
-        </View>
-        <View style={styles.iconcontainer}>
-          <View style={styles.icon}>
-            <AntDesign size={25} color={'black'} name="lock" />
-          </View>
-          <TextInput
-            style={styles.emailfield}
-            placeholder="Confirm Password"
-            placeholderTextColor="black"
+          <CustomInput
+            placeholderText={'Confirm-Password'}
             secureTextEntry={true}
             autoCapitalize="none"
             autoCorrect={false}
-            onChangeText={text => setuserdetail({...userdetail,password:text})}
+            onChangeText={text =>
+              setuserdetail({...userdetail, password: text})
+            }
+            Icon={AntDesign}
+            Icontype={'lock'}
           />
-        </View>
-        <CustomButton 
-        onPress={() => signup()} 
-        buttonStyle={{
-          backgroundColor:'#f95999',
-          margin:10,
-        }}
-        buttonTitle="SignUp" />
+        <CustomButton
+          onPress={() => signup()}
+          buttonStyle={{
+            backgroundColor: '#f95999',
+            margin: 10,
+            width:'50%',
+          }}
+          buttonTitle="SignUp"
+        />
       </ScrollView>
     </View>
   );

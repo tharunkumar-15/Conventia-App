@@ -2,7 +2,8 @@ import React from 'react';
 import {View, Text, StyleSheet, Image} from 'react-native';
 import CustomButton from '../CustomButton';
 import PreviousConverstionTab from './PreviousConversationTab';
-import NewConverstionTab from './NewConversationTab';
+import NewConversationTab from './NewConversationTab';
+import ImageCapture from './ImageCapture';
 
 function CameraResultTab({navigation}) {
   return (
@@ -34,7 +35,18 @@ function CameraResultTab({navigation}) {
         textstyle={{
           fontSize:16,
         }}
-        onPress={() => navigation.navigate(NewConverstionTab)}
+        onPress={() => navigation.navigate(NewConversationTab)}
+      />
+      <CustomButton
+        buttonTitle="Capture Image"
+        buttonStyle={{
+          width: '50%',
+          padding:12,
+        }}
+        textstyle={{
+          fontSize:16,
+        }}
+        onPress={() => navigation.navigate(ImageCapture)}
       />
     </View>
   );

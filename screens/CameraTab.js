@@ -2,9 +2,8 @@ import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import CameraResultTab from './CameraResultTab';
 import PreviousConverstionTab from './PreviousConversationTab';
-import NewConverstionTab from './NewConversationTab';
-import ImageCapture from './ImageCapture';
 import NewConversationTab from './NewConversationTab';
+import ImageCapture from './ImageCapture';
 
 const Stack = createStackNavigator();
 function CameraTab() {
@@ -17,8 +16,8 @@ function CameraTab() {
       <Stack.Screen
         name="PreviousConverstionTab"
         component={PreviousConverstionTab}
-      /> */}
-    </Stack.Navigator>
+      />*/}
+  </Stack.Navigator>
   );
 }
 

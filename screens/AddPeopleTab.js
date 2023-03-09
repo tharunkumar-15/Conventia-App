@@ -1,29 +1,25 @@
-import React from 'react'
-import{
-    View,
-    Text,
-    StyleSheet,
-} from 'react-native';
+import React from 'react';
+import {View, Text, StyleSheet} from 'react-native';
+
 function AddPeopleTab() {
   return (
     <View style={styles.usercontainer}>
-      <Text style={styles.welcometext}>Welcome To Add people Tab</Text>
+      <Text style={styles.welcometext}>Welcome To Add People Tab</Text>
     </View>
   );
 }
 
 export default AddPeopleTab;
 
-const styles=StyleSheet.create({
-    usercontainer:{
-        flex:1,
-        justifyContent:'center',
-        alignItems:'center',
-        backgroundColor:'#fff',
-
-    },
-    welcometext:{
-        fontSize:25,
-        color:'black',
-    },
-})
+const styles = StyleSheet.create({
+  usercontainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  welcometext: {
+    fontSize: 25,
+    color: 'black',
+  },
+});
