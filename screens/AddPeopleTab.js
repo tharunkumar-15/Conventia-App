@@ -7,14 +7,13 @@ import {
   Pressable,
   TextInput,
   ActivityIndicator,
-  KeyboardAvoidingView,
   ToastAndroid,
 } from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CustomButton from '../CustomButton';
 import {auth, db, storage} from '../config';
-import {collection, doc, getDoc, updateDoc, addDoc} from 'firebase/firestore';
+import {collection, addDoc} from 'firebase/firestore';
 import ImagePicker from 'react-native-image-crop-picker';
 import {useSelector} from 'react-redux';
 import {ref, getDownloadURL, uploadBytesResumable} from 'firebase/storage';
@@ -89,20 +88,6 @@ function AddPeopleTab() {
 
     console.log('downloadURL', downloadURL);
   };
-
-  // const senddata = async () => {
-  //   const relativesRef = collection(db, 'Users', user, 'Relatives');
-  //   await addDoc(relativesRef, {
-  //     Relation: relation,
-  //     RelativeName: name,
-  //     ImageUri: downloadURL,
-  //   }).then(() => {
-  //     setName('');
-  //     setRelation('');
-  //     setImage('');
-  //   });
-  //   // uploadimage();
-  // };
 
   return (
     <View style={styles.usercontainer}>
