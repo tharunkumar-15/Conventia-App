@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View} from 'react-native'
+import { Button, StyleSheet, Text, View} from 'react-native'
 import React from 'react'
 import CustomButton from '../CustomButton'
 import { useNavigation } from '@react-navigation/native';
@@ -15,6 +15,7 @@ export default function ImportantConversationCard() {
               }}
               onPress={() => navigation.navigate('ImportantTab')}
           />
+          {/* <Button title='VIEW' onPress={() => navigation.navigate('User Profile',{screen:'UserProfileTab'})}/> */}
        </View>
   )
 }
