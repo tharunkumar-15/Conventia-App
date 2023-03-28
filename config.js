@@ -5,12 +5,13 @@ import { getStorage} from "firebase/storage";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDuE79bi4-w_n397rB2je1WEFl57uIpz0Q",
-  authDomain: "nybula-8ada9.firebaseapp.com",
-  projectId: "nybula-8ada9",
-  storageBucket: "nybula-8ada9.appspot.com",
-  messagingSenderId: "68629750584",
-  appId: "1:68629750584:web:9e56ea7bbf3b65be16d7cd"
+  apiKey: "AIzaSyAdIfRmlydMT5eyHXj-7UKZ7kPahCJVcBo",
+  authDomain: "conventia-application.firebaseapp.com",
+  databaseURL: "https://conventia-application-default-rtdb.firebaseio.com",
+  projectId: "conventia-application",
+  storageBucket: "conventia-application.appspot.com",
+  messagingSenderId: "67422949635",
+  appId: "1:67422949635:web:4aece0e9e0af9744479936"
 };
 
 // Initialize Firebase
