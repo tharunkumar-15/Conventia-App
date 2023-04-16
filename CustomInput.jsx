@@ -16,12 +16,13 @@ const CustomInput = ({ placeholderText, Icon, Icontype, coloricon, ...rest }) =>
         numberOfLines={1}
         placeholder={placeholderText}
         placeholderTextColor="black"
+        maxLength={50}
+        multiline={false}
         {...rest}
       />
     </View>
   );
 };
-
 export default CustomInput;
 
 const styles = StyleSheet.create({

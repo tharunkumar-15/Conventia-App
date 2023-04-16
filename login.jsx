@@ -187,6 +187,7 @@ const styles = StyleSheet.create({
     fontSize: 35,
     marginBottom: 20,
     color: 'black',
+    textAlign:'center'
   },
   logincontainer: {
     width: '100%',

@@ -8,8 +8,8 @@ const firebaseConfig = {
   apiKey: "AIzaSyAdIfRmlydMT5eyHXj-7UKZ7kPahCJVcBo",
   authDomain: "conventia-application.firebaseapp.com",
   databaseURL: "https://conventia-application-default-rtdb.firebaseio.com",
-  storageBucket: "conventia-application.appspot.com",
   projectId: "conventia-application",
+  storageBucket: "conventia-application.appspot.com",
   messagingSenderId: "67422949635",
   appId: "1:67422949635:web:4aece0e9e0af9744479936"
 };

@@ -128,13 +128,14 @@ const styles = StyleSheet.create({
     fontSize: 35,
     marginBottom: 20,
     color:'black',
+    textAlign:'center'
   },
   logincontainer: {
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  loginimage: {
+  loginimage:{
     width: 150,
     height: 150,
     borderRadius: 80,

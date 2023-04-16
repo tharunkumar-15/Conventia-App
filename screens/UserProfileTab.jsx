@@ -10,7 +10,7 @@ import {
 import CustomButton from '../CustomButton';
 import {signOut} from 'firebase/auth';
 import {auth, db, storage} from '../config';
-import {doc, getDoc, updateDoc} from 'firebase/firestore';
+import {doc, getDoc, updateDoc,onSnapshot} from 'firebase/firestore';
 // import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useSelector, useDispatch} from 'react-redux';
@@ -31,13 +31,15 @@ function UserProfileTab({navigation}) {
     Address: '',
     Caregiverno: '',
   });
+  const [isImageUploaded, setIsImageUploaded] = useState(false);
   const [imagePath, setImagePath] = useState('');
+  const [inputValue, setInputValue] = useState('');
   const {user} = useSelector(state => state.useReducer);
   const dispatch = useDispatch();
 
   useEffect(() => {
     Userdata();
-  }, [userdata]);
+  }, []);
 
   const uploadimage = async () => {
     console.log('upload function called');
@@ -64,30 +66,40 @@ function UserProfileTab({navigation}) {
       blobImage,
       metadata,
     );
+
     const downloadURL = await getDownloadURL(snapshot.ref);
     const Imageref = doc(db, 'Users', user);
-    await updateDoc(Imageref, {
+
+    const storageStatus = await updateDoc(Imageref, {
       UserImage: downloadURL,
     });
     console.log('downloadURL', downloadURL);
+
+    setIsImageUploaded(true); // <-- Set state variable to true after image upload
   };
 
   useEffect(() => {
-    if (imagePath !== '') {
+    if (imagePath !== '' && !isImageUploaded) {
+      // <-- Add check for isImageUploaded
       uploadimage();
       setImagePath('');
+    } else if (isImageUploaded) {
+      // <-- Reset state variable to false after image upload
+      setIsImageUploaded(false);
     }
-  }, [imagePath]);
+  }, [imagePath, isImageUploaded]);
 
   const Userdata = async () => {
     try {
       const UserRef = doc(db, 'Users', user);
-      const UserSnap = await getDoc(UserRef);
-      setUserdata(UserSnap.data());
+      onSnapshot(UserRef, (doc) => {
+        setUserdata(doc.data());
+      });
     } catch (error) {
       console.log(error);
     }
   };
+  
 
   function takePhoto() {
     console.log('captured');
@@ -108,6 +120,7 @@ function UserProfileTab({navigation}) {
   const modalHandler = () => {
     setModal(prevstate => !prevstate);
   };
+
   const submitbutton = async () => {
     const UserRef = doc(db, 'Users', user);
     await updateDoc(UserRef, {
@@ -115,8 +128,8 @@ function UserProfileTab({navigation}) {
       Address: update.Address,
       Caregiverno: update.Caregiverno,
     }).then(() => {
+      setInputValue('');
       setModal(!modal);
-      Userdata();
     });
   };
 
@@ -134,33 +147,6 @@ function UserProfileTab({navigation}) {
   };
   return (
     <View style={styles.usercontainer}>
-      <View style={styles.userdetails}>
-        {userdata.UserImage !== '' ? (
-          userdata.UserImage && (
-            <Image
-              source={{uri: userdata.UserImage}}
-              style={styles.userimage}
-            />
-          )
-        ) : (
-          <TouchableOpacity onPress={() => takePhoto()}>
-            <Image
-              source={require('../Userimageicon.png')}
-              style={styles.userimage}
-            />
-          </TouchableOpacity>
-        )}
-
-        {userdata.Name &&<Text style={styles.datacontainer}>Name: {userdata.Name}</Text>}
-        {userdata.Address && (
-          <Text style={styles.datacontainer}>Address: {userdata.Address}</Text>
-        )}
-        {userdata.Caregiverno && (
-          <Text style={styles.datacontainer}>
-            Care-Giver No: {userdata.Caregiverno}
-          </Text>
-        )}
-      </View>
       <View style={styles.buttonstyle}>
         <CustomButton buttonTitle="Sign Out" onPress={() => logout()} />
         <CustomButton
@@ -178,7 +164,7 @@ function UserProfileTab({navigation}) {
                 size={35}
                 color={'black'}
                 name="cross"
-                onPress={()=>modalHandler()}
+                onPress={() => modalHandler()}
                 style={styles.cross}
               />
               <CustomInput
@@ -188,6 +174,7 @@ function UserProfileTab({navigation}) {
                 onChangeText={text => setUpdate({...update, Name: text})}
                 Icon={Ionicons}
                 Icontype="person-outline"
+                value={update}
               />
               <CustomInput
                 placeholderText="Address"
@@ -196,6 +183,7 @@ function UserProfileTab({navigation}) {
                 onChangeText={text => setUpdate({...update, Address: text})}
                 Icon={FontAwesome}
                 Icontype="address-card-o"
+                value={update}
               />
               <CustomInput
                 placeholderText="Card-Giver Number"
@@ -204,6 +192,7 @@ function UserProfileTab({navigation}) {
                 onChangeText={text => setUpdate({...update, Caregiverno: text})}
                 Icon={Feather}
                 Icontype="phone"
+                value={update}
               />
               <CustomButton
                 buttonTitle="Submit"

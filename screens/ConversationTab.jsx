@@ -5,11 +5,10 @@ import {
   StyleSheet,
   Image,
   ScrollView,
-  Pressable,
 } from 'react-native';
 import CustomButton from '../CustomButton';
 import {db} from '../config';
-import {collection,getDocs} from 'firebase/firestore';
+import { collection, getDocs, onSnapshot } from 'firebase/firestore';
 // import { useNavigation } from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 
@@ -19,34 +18,20 @@ function ConversationTab({navigation}) {
   const[data,setdata]=useState([])
   useEffect(() => {
     ReadData();
-  }, [data]);
+  }, []);
 
-  // const ReadData =  () => {
-  //   try {
-  //     const docRef = doc(db, "Users",user);
-  //     const docSnap=getDoc(docRef).then((doc)=>{
-  //       console.log(doc.data(),doc.id);
-  //       setdata(doc.data())
-  //     })
-  //     // console.log(docSnap)
-      
-  //   } catch (error){ 
-  //     console.log("Tharun",error);
-  //   }
-  // };
-  const ReadData = async () => {
-    try {
-        const relativesRef = collection(db, 'Users', user, 'Relatives');
-        const relativesSnap = await getDocs(relativesRef);
-        const relativesData = relativesSnap.docs.map(relativeDoc => ({
-          ...relativeDoc.data(),
-          id:relativeDoc.id
-        }))
-        setdata(relativesData);
-    } catch (error) {
-      console.log(error);
-    }
+  const ReadData = () => {
+    const relativesRef = collection(db, 'Users', user, 'Relatives');
+  
+    onSnapshot(relativesRef, (querySnapshot) => {
+      const relativesData = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setdata(relativesData);
+    });
   };
+  
   return (
     <View style={styles.usercontainer}>
       <ScrollView
@@ -66,9 +51,11 @@ function ConversationTab({navigation}) {
                 buttonTitle="More Info"
                 buttonStyle={{
                   width: '80%',
-                  backgroundColor:"#f95999"
+                  backgroundColor:"#f95999",
+                  marginLeft:10,
                 }}
-                onPress={() => navigation.navigate('Camera',{screen:'PreviousConverstionTab'})}
+                onPress={() => navigation.navigate("Camera",{screen:'PreviousConverstionTab',params:{cards:cards}})}
+                // onPress={() => navigation.navigate('Camera',{screen:'PreviousConverstionTab'},{cards})}
               />
             </View>
           </View>
