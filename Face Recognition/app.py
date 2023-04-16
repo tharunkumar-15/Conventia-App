@@ -27,7 +27,6 @@ def getRelativesImages(userId):
         relativeImages[str(relative['Id'])]=img
     except Exception as e:
       return f"An error occured: {e}"
-    print("Relative images inside app.py: ",relativeImages)
     return relativeImages
 
 

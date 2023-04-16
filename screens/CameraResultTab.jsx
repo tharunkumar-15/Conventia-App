@@ -5,11 +5,12 @@ import CustomButton from '../CustomButton';
 import PreviousConverstionTab from './PreviousConversationTab';
 import NewConversationTab from './NewConversationTab';
 import ImagePicker from 'react-native-image-crop-picker';
+import { useSelector } from 'react-redux';
 
 function CameraResultTab() {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
-
+  const { user } = useSelector(state => state.useReducer);
   const [imagePath, setImagePath] = useState('');
   const [photoTaken, setPhotoTaken] = useState(false);
 
@@ -17,8 +18,8 @@ function CameraResultTab() {
     if (isFocused) {
       takePhoto();
     }
-  },[isFocused]);
-  
+  }, [isFocused]);
+
   function takePhoto() {
     console.warn("Captured");
     ImagePicker.openCamera({
@@ -57,7 +58,7 @@ function CameraResultTab() {
       <Text style={styles.welcometext}>Details of detected face</Text>
       {imagePath ? (
         <Image
-          source={{ uri: `file://${imagePath}`}}
+          source={{ uri: `file://${imagePath}` }}
           style={styles.loginimage}
           resizeMode="stretch"
         />
