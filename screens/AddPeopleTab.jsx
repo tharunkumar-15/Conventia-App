@@ -3,13 +3,13 @@ import React, {useRef, useState} from 'react';
 import {
   View,
   Text,
+  ScrollView,
   StyleSheet,
   Pressable,
   TextInput,
   ActivityIndicator,
   ToastAndroid,
 } from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CustomButton from '../CustomButton';
 import {auth, db, storage} from '../config';
@@ -26,7 +26,7 @@ function AddPeopleTab() {
   const [name, setName] = useState('');
   const [relation, setRelation] = useState('');
   const [showloader, setShowloader] = useState(false);
-  const input = useRef(null);
+
 
   function takePhoto() {
     ImagePicker.openCamera({
