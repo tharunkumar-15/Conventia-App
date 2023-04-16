@@ -54,7 +54,7 @@ function SignupPage({navigation}) {
         <View style={styles.appcontainer}>
           <Text style={styles.appname}>Conventia</Text>
           <Image
-            source={require('./Login.jpg')}
+            source={require('./Loginimage.jpg')}
             style={styles.loginimage}
             resizeMode="stretch"
           />
