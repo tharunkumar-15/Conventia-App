@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "conventia-application",
+  "private_key_id": "426f2278d2e1a0d73a6afb050b0c6bf22afdc604",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC0civ/FhexWCZD\nJArw5J5kuOGUWDoh1IUlQQc4WqSnTw0WHYFvHZCy92ZGUt3d5itQ66EGfaQUECJJ\nsSwlr/AYs0AoWGoSDyo6gF7GKHXzvoSQgdDYzH38Z1m7hQDwlYVtJl9YlwL05927\nm8LqiLcrM7biMy95a7lg+r7zNw9mAop2GgxV1l6loTbHRrC+7cfVhWcTzAKr988T\ntlnP6Fh2geK52+yXoI1knNbEtQhCvp8JCZLgIUZ/dozymDxbvOZcI6KT+JaScLi+\n8N6HyGisXqyIf/NdfDxrcN2HwgNxiwOwplOaHYqaGlPoZ6Cozk29z/5PJlAGoQoz\nP9AeMo9jAgMBAAECggEAU3qKTh17YokkUmVnRmCNwo0hlw5l/maiHkUCQRj2GYzh\nwfxud+hWm+UGhLwrdk/YdDw+J5GSidGY+zyi7uCBE/xBTyjwEWDAqYXf0o6/Wr8l\n9vCHnPSlyFJL2gvDDootyvw4mfRq4sAt/XAm8XfEPZFUJzuE2Ah1H5+BHWW4kvkM\nXkqRvkFfj2AQNMdGHkqYsUJV5HfV1WhyGeYePjzmAufEIH7UHToRp/22L8pNe4fk\nTM2nuXCcaiRue5pfW23PCV7mQEK0aLOm6bCtw8orayBHxL9nDMWQ2JvLVYkLoeo3\nCb1IseMAkOaqc2ycVsWclhvCihUdnpOlFpMQSaERiQKBgQDp+jBliJcce9h+QRJV\ns2JC5D+N30m7EO9EG8uv4Om4qFT3RfYa89s9Ufq2DvoJRbOivmKnTxb7Nz9VFBGO\ns5gtBrUtUWlRSO1zepIlKzDFMG+Sur4FSDg9X9NVyV5CJM+aAau/10/Dsxm6mG9c\njCaS33SxyaYo9lB5aAYdxUUYNQKBgQDFbh3Qxq97tUh70yv/Vb2qaonz7jxMCVIX\nHrirGITQw0KEn/2F84boUWQgEoeFmNCXYqP6NPXg+K/sBUIEBw5WD7av93aM/IHQ\nJvKb6BjkBiyhPPDV7LKVrUUpGOBA+Zkh5ZbHeevxI0dlI5CMKFMY487pNbQZjoBX\nj8XnKhRsNwKBgBCThAg9dA81ivHu5ECkE8sPZp1De3LAUWMu4PBV69kEO/jEwRnJ\nuveOLkflqbssb/yQpmaaCNPFZzw8zr2gZaCTABT01pRGqWPsBByUAcGGm/D2P+4Z\n3roiZtOGD6J5/yc3BRbzRxhjQOhiUklpOHZhVGAgHCB8yti/EOfdCPcdAoGBAJ4e\nuzJiblkdr5e8YRh2ixjZivMacqBTNrPdnvkpAfZQ7A1cNaf6iqm1xgMJ1BBje2xD\nTCEwGVy8z+ivrVecbxbuLtpvzzrLYQxcpSHImWbGqyfXrusmT0EhLKrliXWAcex7\n/G52b0kJgDy4ZyRZh3P/v893e26cep2mQFILmZ+xAoGAETEFLtbzkKZxo9uEqD3H\nu7/ifyoQ/rS8oyjEt77zxL835fzAHhnV++2pYZ0YguU5RPpDoK9x2qWx5hARcxsD\nGoZYVS/6O/2SmUP72i3I6xuEtiU53LbwuHUOSoWtWlyuxWdqZyxkkcIBSpzZ8xak\nH7BWLYuFtkHjq3gA3C6fzCw=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-3su2a@conventia-application.iam.gserviceaccount.com",
+  "client_id": "103374094665294761437",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-3su2a%40conventia-application.iam.gserviceaccount.com"
+}

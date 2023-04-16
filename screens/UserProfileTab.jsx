@@ -147,37 +147,6 @@ function UserProfileTab({navigation}) {
   };
   return (
     <View style={styles.usercontainer}>
-      <View style={styles.userdetails}>
-        {userdata.UserImage !== '' ? (
-          userdata.UserImage && (
-            <TouchableOpacity onPress={() => takePhoto()}>
-              <Image
-                source={{uri: userdata.UserImage}}
-                style={styles.userimage}
-              />
-            </TouchableOpacity>
-          )
-        ) : (
-          <TouchableOpacity onPress={() => takePhoto()}>
-            <Image
-              source={require('../Userimageicon.png')}
-              style={styles.userimage}
-            />
-          </TouchableOpacity>
-        )}
-
-        {userdata.Name && (
-          <Text style={styles.datacontainer}>Name: {userdata.Name}</Text>
-        )}
-        {userdata.Address && (
-          <Text style={styles.datacontainer}>Address: {userdata.Address}</Text>
-        )}
-        {userdata.Caregiverno && (
-          <Text style={styles.datacontainer}>
-            Care-Giver No: {userdata.Caregiverno}
-          </Text>
-        )}
-      </View>
       <View style={styles.buttonstyle}>
         <CustomButton buttonTitle="Sign Out" onPress={() => logout()} />
         <CustomButton
