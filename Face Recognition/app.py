@@ -49,6 +49,20 @@ def predictFace():
     images=getRelativesImages(userId)
     predictedFace=faceRecognition.predictFace(img,images)
     return jsonify({'face':predictedFace})
+  
+@app.route('/perform-diarization',methods=['POST'])
+def speechDiarization():
+  audio=request.args.get('audiopath')
+  if 'file' not in request.files:
+    return jsonify({'error':'media not provided'}),400
+  file=request.files['file']
+  if file.filename=='':
+    return jsonify({'error': 'no file selected'}),400
+  if file:
+    filename=secure_filename(file.filename)
+    #read image file string data
+    filestr = file.read()
+    
 
 if __name__=='__main__':
   app.run(debug=True)

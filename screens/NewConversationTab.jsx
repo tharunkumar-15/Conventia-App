@@ -12,12 +12,17 @@ import {
 import {MotiView} from '@motify/components';
 import {Easing} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/SimpleLineIcons';
+import axios from 'axios';
+import {auth, db, storage} from '../config';
+import {collection, addDoc} from 'firebase/firestore';
+import {useSelector} from 'react-redux';
+import {ref, getDownloadURL, uploadBytesResumable} from 'firebase/storage';
+import { error } from 'console';
 
 const NewConversationTab = ({navigation}) => {
-  const [audioFile, setAudioFile] = useState('');
+  // const [audioFile, setAudioFile] = useState('Demo');
   // const [loaded, setLoaded] = useState(false);
-  // let sound = null;
-
+  let audio='';
   const [recording, setRecording] = useState(false);
 
   const animationHandler = () => {
@@ -48,6 +53,18 @@ const NewConversationTab = ({navigation}) => {
     initAudioRecord();
   }, []);
 
+  // useEffect(() =>{
+  //   if(audiopath!='')
+  //   axios.get(`https://127.0.0.1:5000/perform-diarization?id=${user}&url=${audiopath}`)
+  //   .then(response => {
+  //     console.log("AudioResponse: ", response.data)
+  //   })
+  //   .catch(error => {
+  //     console.log("AudioError: ", response.data)
+  //     console.error(error);
+  //   });
+  // },[audiopath]);
+
   const checkPermission = async () => {
     const granted = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
@@ -68,18 +85,47 @@ const NewConversationTab = ({navigation}) => {
     const p = await Permissions.request('microphone');
   };
 
+  const sendaudio = async () => {
+    console.log('upload function called');
+    console.log("AudioFiePathUploading: ",audio)
+    const blobAudio = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function () {
+        reject(new TypeError('Newtork error failed'));
+      };
+      xhr.responseType = 'blob';
+      xhr.open('GET', audio, true);
+      xhr.send(null);
+    });
+
+    const metadata = {
+      contentType: 'audio/wav',
+    };
+
+    const storageRef = ref(storage, 'ConversationAudio/' + Date.now());
+    const snapshot = await uploadBytesResumable(
+      storageRef,
+      blobAudio,
+      metadata,
+    );
+    const downloadAudioURL = await getDownloadURL(snapshot.ref);
+    console.log('downloadAudioURL: ', downloadAudioURL);
+  };
+
   const start = () => {
-    setAudioFile('');
     setRecording(true);
-    // setLoaded(false);
     AudioRecord.start();
   };
 
   const stop = async () => {
-    let audioFile = await AudioRecord.stop();
-    console.log('audioFile', audioFile);
-    setAudioFile(audioFile);
+    audio = await AudioRecord.stop();
+    console.log('audiopathcheck',audio);
+    //setAudioFile(audiopath);
     setRecording(false);
+    sendaudio();
   };
 
   // const load = () => {
