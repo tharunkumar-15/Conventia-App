@@ -21,7 +21,7 @@ import {useSelector} from 'react-redux';
 import {db} from '../config';
 import {collection, addDoc} from 'firebase/firestore';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-
+import axios from 'axios';
 
 const NewConversationTab = ({navigation}) => {
   const [audioFile, setAudioFile] = useState('');

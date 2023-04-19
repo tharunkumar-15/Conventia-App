@@ -9,6 +9,8 @@ from PIL import Image
 import requests
 from io import BytesIO
 from urllib.request import urlopen
+import requests
+from PIL import Image
 
 cred=credentials.Certificate("key.json")
 default_app=initialize_app(cred)
@@ -33,22 +35,34 @@ def getRelativesImages(userId):
 @app.route('/predict-face',methods=['POST'])
 def predictFace():
   userId=request.args.get('id')
-  if 'file' not in request.files:
-    return jsonify({'error':'media not provided'}),400
-  file=request.files['file']
-  if file.filename=='':
-    return jsonify({'error': 'no file selected'}),400
-  if file:
-    filename=secure_filename(file.filename)
-    #read image file string data
-    filestr = file.read()
-    #convert string data to numpy array
-    file_bytes = numpy.fromstring(filestr, numpy.uint8)
-    # convert numpy array to image
-    img = cv2.imdecode(file_bytes, cv2.IMREAD_UNCHANGED)
-    images=getRelativesImages(userId)
-    predictedFace=faceRecognition.predictFace(img,images)
-    return jsonify({'face':predictedFace})
+  data = request.get_json()
+  print("user image: ",data['url'])
+  resp = urlopen(data['url'])
+  img = numpy.asarray(bytearray(resp.read()), dtype="uint8")
+  img = cv2.imdecode(img, cv2.IMREAD_COLOR)
+  images=getRelativesImages(userId)
+  predictedFace=faceRecognition.predictFace(img,images)
+  return jsonify({'face':predictedFace})
+
+# @app.route('/predict-face',methods=['POST'])
+# def predictFace():
+#   userId=request.args.get('id')
+#   if 'file' not in request.files:
+#     return jsonify({'error':'media not provided'}),400
+#   file=request.files['file']
+#   if file.filename=='':
+#     return jsonify({'error': 'no file selected'}),400
+#   if file:
+#     filename=secure_filename(file.filename)
+#     #read image file string data
+#     filestr = file.read()
+#     #convert string data to numpy array
+#     file_bytes = numpy.fromstring(filestr, numpy.uint8)
+#     # convert numpy array to image
+#     img = cv2.imdecode(file_bytes, cv2.IMREAD_UNCHANGED)
+#     images=getRelativesImages(userId)
+#     predictedFace=faceRecognition.predictFace(img,images)
+#     return jsonify({'face':predictedFace})
 
 if __name__=='__main__':
   app.run(debug=True)
