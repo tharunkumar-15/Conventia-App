@@ -12,6 +12,7 @@ import {
 import {MotiView} from '@motify/components';
 import {Easing} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/SimpleLineIcons';
+import axios from 'axios';
 
 const NewConversationTab = ({navigation}) => {
   const [audioFile, setAudioFile] = useState('');
