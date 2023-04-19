@@ -5,22 +5,36 @@ import AudioRecord from 'react-native-audio-record';
 import {
   View,
   PermissionsAndroid,
-  Button,
   Pressable,
   StyleSheet,
+  Modal,
+  Text,
+  TouchableOpacity,
 } from 'react-native';
 import {MotiView} from '@motify/components';
 import {Easing} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/SimpleLineIcons';
+import CustomInput from '../CustomInput';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import CustomButton from '../CustomButton';
+import {useSelector} from 'react-redux';
+import {db} from '../config';
+import {collection, addDoc} from 'firebase/firestore';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 
 const NewConversationTab = ({navigation}) => {
   const [audioFile, setAudioFile] = useState('');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [dropdownValue, setDropdownValue] = useState('true');
+  const [important, setImportant] = useState(false);
+
+  const [title, setTitle] = useState('');
   // const [loaded, setLoaded] = useState(false);
   // let sound = null;
 
   const [recording, setRecording] = useState(false);
-
+  const {user} = useSelector(state => state.useReducer);
   const animationHandler = () => {
     setRecording(!recording);
   };
@@ -81,8 +95,41 @@ const NewConversationTab = ({navigation}) => {
     console.log('audioFile', audioFile);
     setAudioFile(audioFile);
     setRecording(false);
+    modalHandler();
   };
 
+  const modalHandler = () => {
+    setModalOpen(!modalOpen);
+  };
+
+  const toggleHandler = () => {
+    setImportant(!important);
+  };
+
+  // const submitdata = () => {
+  //   console.log('Title:', title);
+  //   const appointquery = collection(
+  //     db,
+  //     'Users',
+  //     user,
+  //     'Relatives',
+  //     'vcXSI5Ge9zpSyZF4VZin',
+  //     'RecordedConversation',
+  //   );
+  //   addDoc(appointquery, {
+  //     Title: title,
+  //     Important:important,
+  //   })
+  //     .then(() => {
+  //       setTitle(''); // <-- Reset the title state to an empty string
+  //       modalHandler();
+  //       alert('Data sent successfully');
+  //     })
+  //     .catch(error => {
+  //       console.log(error);
+  //     });
+  // };
+  
   // const load = () => {
   //   return new Promise((resolve, reject) => {
   //     if (!audioFile) {
@@ -142,6 +189,38 @@ const NewConversationTab = ({navigation}) => {
         />
       </Pressable>
       {/* <Button onPress={play} title="Play" disabled={!audioFile}/> */}
+      <Modal
+        visible={modalOpen}
+        onRequestClose={() => modalHandler()}
+        animationType="fade"
+        transparent={true}>
+        <View style={styles.container}>
+          <View style={styles.modalcontent}>
+            <CustomInput
+              placeholderText="Title"
+              autoCapitalize="none"
+              autoCorrect={false}
+              Icon={MaterialIcons}
+              Icontype="title"
+              onChangeText={text => setTitle(text)}
+              value={title}
+            />
+            <View style={styles.tooglecontainer}>
+              <Text style={styles.toggleText}>Important Conversation:</Text>
+              <TouchableOpacity
+                style={styles.toggleicon}
+                onPress={toggleHandler}>
+                {important ? (
+                  <FontAwesome name="toggle-on" size={30} color="black" />
+                ) : (
+                  <FontAwesome name="toggle-off" size={30} color="black" />
+                )}
+              </TouchableOpacity>
+            </View>
+            <CustomButton buttonTitle="Submit" onPress={() => {}} />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -158,5 +237,38 @@ const styles = StyleSheet.create({
   center: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  modalcontent: {
+    backgroundColor: '#F8F6F3',
+    width: '90%',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    position: 'relative',
+  },
+  toggleText: {
+    color: 'black',
+    fontSize: 19,
+    fontWeight: 'bold',
+    marginTop: 15,
+    marginBottom: 18,
+  },
+  toggleicon: {
+    marginLeft: 10,
+    marginTop: 10,
+  },
+  tooglecontainer: {
+    flexDirection: 'row',
   },
 });

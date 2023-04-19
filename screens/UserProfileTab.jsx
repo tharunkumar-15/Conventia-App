@@ -52,7 +52,7 @@ function UserProfileTab({navigation}) {
         reject(new TypeError('Newtork error failed'));
       };
       xhr.responseType = 'blob';
-      xhr.open('GET', imagePath, true);
+      xhr.open('GET',imagePath, true);
       xhr.send(null);
     });
 
@@ -145,15 +145,48 @@ function UserProfileTab({navigation}) {
       console.log(error);
     }
   };
+  
   return (
     <View style={styles.usercontainer}>
+       <View style={styles.userdetails}>
+        {userdata.UserImage !== '' ? (
+          userdata.UserImage && (
+            <TouchableOpacity onPress={() => takePhoto()}>
+              <Image
+                source={{uri: userdata.UserImage}}
+                style={styles.userimage}
+              />
+            </TouchableOpacity>
+          )
+        ) : (
+          <TouchableOpacity onPress={() => takePhoto()}>
+            <Image
+              source={require('../Userimageicon.png')}
+              style={styles.userimage}
+            />
+          </TouchableOpacity>
+        )}
+
+        {userdata.Name && (
+          <Text style={styles.datacontainer}>Name: {userdata.Name}</Text>
+        )}
+        {userdata.Address && (
+          <Text style={styles.datacontainer}>Address: {userdata.Address}</Text>
+        )}
+        {userdata.Caregiverno && (
+          <Text style={styles.datacontainer}>
+            Care-Giver No: {userdata.Caregiverno}
+          </Text>
+        )}
+      </View>
       <View style={styles.buttonstyle}>
         <CustomButton buttonTitle="Sign Out" onPress={() => logout()} />
         <CustomButton
           buttonTitle="Edit Profile"
           onPress={() => modalHandler()}
         />
-        <Modal
+
+<Modal
           visible={modal}
           onRequestClose={() => modalHandler()}
           animationType="fade"
@@ -264,4 +297,18 @@ const styles = StyleSheet.create({
     right: 0,
     paddingBottom: 10,
   },
+  toggleText: {
+    color: 'black',
+    fontSize: 19,
+    fontWeight: 'bold',
+    marginTop:15,
+    marginBottom: 18,
+  },
+  toggleicon:{
+    marginLeft:10,
+    marginTop:10,
+  },
+  tooglecontainer:{
+    flexDirection:'row'
+  }
 });

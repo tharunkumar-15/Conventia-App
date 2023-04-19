@@ -37,6 +37,7 @@ function SignupPage({navigation}) {
           Address:'',
           Caregiverno:'',
         });
+        
         alert('User created successfully');
         navigation.navigate('userloginpage');
       })
