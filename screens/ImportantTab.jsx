@@ -6,6 +6,7 @@ import {useSelector} from 'react-redux';
 import CustomCard from './CustomCard';
 import CustomInput from '../CustomInput';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import AntDesign from 'react-native-vector-icons/AntDesign'
 import Entypo from 'react-native-vector-icons/Entypo';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {format} from 'date-fns';
@@ -15,11 +16,13 @@ export default function ImportantTab() {
   const [data, setData] = useState([]);
   const [modalStates, setModalStates] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterselected,setFilterselected] = useState({
-    Ascendingrelativename: false,
+  const [importantData, setImportantData] = useState([]);
+  const [filterselected, setFilterselected] = useState({
+    Ascendingrelativename: true,
     Descendingrelativename: false,
     Ascendingrelation: false,
     Descendingrelation: false,
+    Default: true,
   });
   const [relatives, setRelatives] = useState({});
   const keys = ['Summary', 'SummaryDate'];
@@ -38,64 +41,122 @@ export default function ImportantTab() {
   }, [data]);
 
   useEffect(() => {
+    setImportantData(importantconversation);
+    console.log('Data for filter:', importantData);
+  }, [importantconversation]);
+
+  useEffect(() => {
     console.log('Relatives fetched', relatives);
   }, [relatives]);
 
-  useEffect(() => {
-    const relativesRef = collection(db, 'Users', user, 'Relatives');
-    const relativesData = [];
-    const unsubscribe = onSnapshot(relativesRef, querySnapshot => {
-      querySnapshot.forEach(doc => {
-        const relativeInfo = doc.data();
-        setRelatives(prev => {
-          return {
-            ...prev,
-            [doc.id]: {
-              name: relativeInfo.RelativeName,
-              relation: relativeInfo.Relation,
-            },
-          };
-        });
-        const importRef = collection(
-          db,
-          'Users',
-          user,
-          'Relatives',
-          doc.id,
-          'RecordedConversation',
+
+  useEffect(()=>{
+    searchfilter()
+  },[searchQuery])
+
+  const searchfilter = () => {
+    const filteredData = importantData.filter(info =>
+      keys.some(key => {
+        const filterKey =
+          key === 'SummaryDate'
+            ? format(
+                new Date(info.SummaryDate.seconds * 1000),
+                'MMM d, yyyy h:mm a',
+              )
+            : info[key];
+        return (
+          filterKey &&
+          typeof filterKey === 'string' &&
+          filterKey.toLowerCase().includes(searchQuery.toLowerCase())
         );
+      }),
+    );
+    setImportantData(filteredData);
+  };
 
-        const importQuery = query(importRef, where('Important', '==', true));
+  const defaultdata=()=>{
+    console.log("Defaultdata called");
+    console.log("ImportantData called:",importantconversation);
+    setImportantData(importantconversation);
+    console.log("Inside Defaultdata",importantData)
+    openmodal();
+  }
 
-        onSnapshot(importQuery, importSnapshot => {
-          const importData = importSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
+  const ascendingordername = () => {
+    let result=importantData.sort((a,b)=>relatives[`${a.RelativeId}`].name.localeCompare(relatives[`${b.RelativeId}`].name))
+    setImportantData(result);
+  }
 
-          relativesData.push(...importData);
-          console.log('Important Data:', importData);
-          setData(prevData => {
-            return {...prevData, [doc.id]: importData};
-          });
-          setModalStates(new Array(relativesData.length).fill(false));
-        });
-      });
-    });
-    return unsubscribe;
-  }, []);
+  const descendingordername = () => {
+    let result=importantData.sort((a,b)=>relatives[`${b.RelativeId}`].name.localeCompare(relatives[`${a.RelativeId}`].name))
+    setImportantData(result);
+    openmodal()
+  };
+
+  const ascendingorderrelative = () => {
+    let result=importantData.sort((a,b)=>relatives[`${a.RelativeId}`].relation.localeCompare(relatives[`${b.RelativeId}`].relation))
+    setImportantData(result);
+    openmodal()
+  };
+
+  const descendingorderrelative = () => {
+    let result=importantData.sort((a,b)=>relatives[`${b.RelativeId}`].relation.localeCompare(relatives[`${a.RelativeId}`].relation))
+    setImportantData(result);
+    openmodal()
+  };
+
+  // useEffect(() => {
+  //   const relativesRef = collection(db,'Users',user,'Relatives');
+  //   const relativesData = [];
+  //   const unsubscribe = onSnapshot(relativesRef, querySnapshot => {
+  //     querySnapshot.forEach(doc => {
+  //       const relativeInfo = doc.data();
+  //       setRelatives(prev => {
+  //         return {
+  //           ...prev,
+  //           [doc.id]: {
+  //             name: relativeInfo.RelativeName,
+  //             relation: relativeInfo.Relation,
+  //           },
+  //         };
+  //       });
+  //       const importRef = collection(
+  //         db,
+  //         'Users',
+  //         user,
+  //         'Relatives',
+  //         doc.id,
+  //         'RecordedConversation',
+  //       );
+  //       const importQuery = query(importRef, where('Important', '==', true));
+
+  //       onSnapshot(importQuery, importSnapshot => {
+  //         const importData = importSnapshot.docs.map(doc => ({
+  //           id: doc.id,
+  //           ...doc.data(),
+  //         }));
+
+  //         relativesData.push(...importData);
+  //         console.log('Important Data:', importData);
+  //         setData(prevData => {
+  //           return {...prevData, [doc.id]: importData};
+  //         });
+  //         setModalStates(new Array(relativesData.length).fill(false));
+  //       });
+  //     });
+  //   });
+  //   return unsubscribe;
+  // }, []);
 
   const openmodal = () => {
     setFilterModal(!filtermodal);
   };
 
   return (
-    <View style={styles.Cardcontainer}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{alignItems: 'center'}}
         style={styles.scrollcontainer}>
-        <Text style={styles.Tabtext}>Important Conversation Tab</Text>
         <View style={styles.filtercontainer}>
           <View style={styles.searchcontainer}>
             <CustomInput
@@ -105,6 +166,7 @@ export default function ImportantTab() {
               Icon={FontAwesome}
               Icontype="search"
               onChangeText={text => setSearchQuery(text)}
+              value={searchQuery}
             />
           </View>
           <View style={styles.filtericon}>
@@ -112,7 +174,6 @@ export default function ImportantTab() {
               <Image
                 source={require('../filter.png')}
                 style={styles.Icon}
-                // resizeMode="stretch"
               />
             </TouchableOpacity>
           </View>
@@ -130,97 +191,151 @@ export default function ImportantTab() {
                   onPress={() => openmodal()}
                   style={styles.cross}
                 />
+              <View style={styles.selectedicon}>
                 <Text
-                  style={
-                   filterselected.Ascendingrelativename
-                      ? styles.selectedstyle
-                      : styles.filtertext
-                  }
+                  style={styles.filtertext}
                   onPress={() => {
-                    setFilterselected({Ascendingrelation:false,Ascendingrelativename:true,Descendingrelation:false,Descendingrelativename:false});
+                      defaultdata();
+                      setFilterselected({
+                        Ascendingrelation: false,
+                        Ascendingrelativename: false,
+                        Descendingrelation: false,
+                        Descendingrelativename: false,
+                        Default: true,
+                      });
+                  }}>
+                  Default
+                </Text>
+                {filterselected.Default &&<AntDesign
+                  style={styles.selecticon}
+                  size={22}
+                  name="checkcircle"
+                  color="green"
+                />}
+              </View>
+              <View style={styles.selectedicon}>
+                <Text
+                  style={styles.filtertext}
+                  onPress={() => {
+                      ascendingordername(),
+                      setFilterselected({
+                        Ascendingrelation: false,
+                        Ascendingrelativename: true,
+                        Descendingrelation: false,
+                        Descendingrelativename: false,
+                        Default: false,
+                      });
                   }}>
                   Ascending Order based on relativename
-               </Text>
+                </Text>
+                {filterselected.Ascendingrelativename &&<AntDesign
+                  style={styles.selecticon}
+                  size={22}
+                  name="checkcircle"
+                  color="green"
+                />}
+              </View>
+              <View style={styles.selectedicon}>
                 <Text
-                  style={
-                    filterselected.Descendingrelativename
-                      ? styles.selectedstyle
-                      : styles.filtertext
-                  }
+                  style={ styles.filtertext}
                   onPress={() => {
-                    setFilterselected({Ascendingrelation:false,Ascendingrelativename:false,Descendingrelation:false,Descendingrelativename:true});
+                    descendingordername()
+                    setFilterselected({
+                      Ascendingrelation: false,
+                      Ascendingrelativename: false,
+                      Descendingrelation: false,
+                      Descendingrelativename: true,
+                      Default: false,
+                    });
                   }}>
                   Descending Order based on relativename
                 </Text>
+                {filterselected.Descendingrelativename&&<AntDesign
+                  style={styles.selecticon}
+                  size={22}
+                  name="checkcircle"
+                  color="green"
+                />
+              }
+              </View>
+              <View style={styles.selectedicon}>
                 <Text
-                  style={
-                    filterselected.Ascendingrelation
-                      ? styles.selectedstyle
-                      : styles.filtertext
-                  }
+                  style={styles.filtertext}
                   onPress={() => {
-                    setFilterselected({Ascendingrelation:true,Ascendingrelativename:false,Descendingrelation:false,Descendingrelativename:false});
+                    ascendingorderrelative()
+                    setFilterselected({
+                      Ascendingrelation: true,
+                      Ascendingrelativename: false,
+                      Descendingrelation: false,
+                      Descendingrelativename: false,
+                      Default: false,
+                    });
                   }}>
                   Ascendig Order based on relation
                 </Text>
+                {filterselected.Ascendingrelation&&<AntDesign
+                  style={styles.selecticon}
+                  size={22}
+                  name="checkcircle"
+                  color="green"
+                />
+                }
+              </View>
+              <View style={styles.selectedicon}>
                 <Text
-                  style={
-                    filterselected.Descendingrelation
-                      ? styles.selectedstyle
-                      : styles.filtertext
-                  }
+                  style={ styles.filtertext}
                   onPress={() => {
-                    setFilterselected({Ascendingrelation:false,Ascendingrelativename:false,Descendingrelation:true,Descendingrelativename:false});
+                    descendingorderrelative()
+                    setFilterselected({
+                      Ascendingrelation: false,
+                      Ascendingrelativename: false,
+                      Descendingrelation: true,
+                      Descendingrelativename: false,
+                      Default: false,
+                    });
                   }}>
                   Descending Order based on relation
                 </Text>
+                {filterselected.Descendingrelation &&<AntDesign
+                  style={styles.selecticon}
+                  size={22}
+                  name="checkcircle"
+                  color="green"
+                />}
+              </View>
               </View>
             </View>
           </Modal>
         </View>
-        {importantconversation &&
-          importantconversation
-            .filter(info =>
-              keys.some(key => {
-                console.log('Infodate', info);
-                const filterKey =
-                  key === 'SummaryDate'
-                    ? format(
-                        new Date(info.SummaryDate.seconds * 1000),
-                        'MMM d, yyyy h:mm a',
-                      )
-                    : info[key];
-                return (
-                  filterKey &&
-                  typeof filterKey === 'string' &&
-                  filterKey.toLowerCase().includes(searchQuery.toLowerCase())
-                );
-              }),
-            )
-            .map((info, index) => (
-              <View key={index} style={styles.cardstyle}>
-                <CustomCard
-                  info={info}
-                  modalStates={modalStates}
-                  setModalStates={setModalStates}
-                  index={index}
-                  setData={setData}
-                  relativeid={info.RelativeId}
-                  relativeName={relatives[`${info.RelativeId}`].name}
-                  relativeRelation={relatives[`${info.RelativeId}`].relation}
-                  setImportant={setImportantConversation}
-                />
-              </View>
-            ))}
+        {importantData &&
+          importantData.map((infodata, index) => {
+            console.log("Suhas:",importantconversation)
+            console.log("Surya:",importantData)
+            return(
+            <View key={index} style={styles.cardstyle}>
+              <CustomCard
+                info={infodata}
+                modalStates={modalStates}
+                setModalStates={setModalStates}
+                index={index}
+                setData={setData}
+                relativeid={infodata.RelativeId}
+                relativeName={relatives[`${infodata.RelativeId}`].name}
+                relativeRelation={relatives[`${infodata.RelativeId}`].relation}
+                setImportant={setImportantData}
+              />
+            </View>
+          )
+      })}
       </ScrollView>
-    </View>
   );
 }
 const styles = StyleSheet.create({
   Cardcontainer: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: '#F8F6F3',
+    backgroundColor: 'white',
+    marginTop:30,
   },
   Tabtext: {
     fontSize: 25,
@@ -250,7 +365,7 @@ const styles = StyleSheet.create({
   Icon: {
     width: 28,
     height: 27,
-    marginLeft: 5,
+    marginLeft: 10,
     marginTop: 21,
   },
   modalstyle: {
@@ -261,7 +376,7 @@ const styles = StyleSheet.create({
   },
   modalbackground: {
     width: '100%',
-    height: 270,
+    height: 290,
     alignItems: 'center',
     backgroundColor: '#F8F6F3',
     borderRadius: 7,
@@ -271,9 +386,7 @@ const styles = StyleSheet.create({
   },
   filtertext: {
     color: 'black',
-    fontSize: 17,
-    textAlign: 'center',
-    marginTop: 15,
+    fontSize: 15,
     fontWeight: 'bold',
   },
   cross: {
@@ -293,4 +406,13 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
     marginTop: 10,
   },
+  selectedicon:{
+    flex:2,
+    flexDirection:'row',
+    justifyContent:'space-between',
+    padding:8,
+  },
+  selecticon:{
+    marginLeft:7,
+  }
 });

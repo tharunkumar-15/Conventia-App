@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
   iconcontainer: {
     marginTop: 10,
     marginBottom: 20,
-    width: 290,
+    width: windowWidth - 60,
     borderColor: 'black',
     borderRadius: 3,
     borderWidth: 1,
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     height: windowHeight / 15,
   },
   emailfield: {
-    width: '90%',
+    flex: 1,
     fontSize: 16,
     color: 'black',
     justifyContent: 'center',
@@ -56,3 +56,4 @@ const styles = StyleSheet.create({
     width: 60,
   },
 });
+

@@ -18,7 +18,9 @@ import {collection, doc, getDoc, updateDoc, addDoc} from 'firebase/firestore';
 import ImagePicker from 'react-native-image-crop-picker';
 import {useSelector} from 'react-redux';
 import {ref, getDownloadURL, uploadBytesResumable} from 'firebase/storage';
-
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import CustomInput from '../CustomInput';
 function AddPeopleTab() {
   const {user} = useSelector(state => state.useReducer);
   const [image, setImage] = useState(
@@ -107,6 +109,7 @@ function AddPeopleTab() {
   return (
     <View style={styles.usercontainer}>
       <ScrollView styles={styles.usercontainer}>
+        <Text style={styles.tabtitle}>Add People Tab</Text>
         <View style={styles.imagecomponent}>
           <Image
             source={{
@@ -123,32 +126,33 @@ function AddPeopleTab() {
             />
           </Pressable>
         </View>
-
-        <Text style={styles.headtext}>Enter details</Text>
-
-        <View style={styles.inputtextstyle}>
-          <Text style={styles.inputtext}>Name:</Text>
-          <TextInput
-            style={styles.textstyle}
+      <View style={styles.inputtextstyle}>
+        <CustomInput
+            placeholderText={'Name'}
+            autoCapitalize="none"
+            autoCorrect={false}
             onChangeText={text => {
               setName(text);
             }}
             value={name}
+            Icon={Ionicons}
+            Icontype={'ios-person-outline'}
           />
-
-          <Text style={styles.inputtext1}>Relation:</Text>
-          <TextInput
-            style={styles.textstyle}
+          <CustomInput
+            placeholderText={'Relation'}
+            autoCapitalize="none"
+            autoCorrect={false}
             onChangeText={text => {
               setRelation(text);
             }}
             value={relation}
+            Icon={MaterialCommunityIcons}
+            Icontype={'relation-one-to-one'}
           />
-        </View>
         <CustomButton
-          buttonStyle={{marginLeft: 200}}
           onPress={() => senddata()}
         />
+      </View>
       </ScrollView>
       {showloader && (
         <View style={styles.loading}>
@@ -200,6 +204,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   inputtextstyle: {
+    flex:1,
+    justifyContent:'center',
+    alignItems:'center',
     margin: 10,
     padding: 20,
     borderRadius: 10,
@@ -209,7 +216,7 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
     borderRadius: 100,
-    marginTop: 80,
+    marginTop: 50,
   },
   dotStyle: {
     width: 60,
@@ -231,4 +238,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  tabtitle:{
+    fontSize:22,
+    color:'black',
+    fontWeight:'bold',
+    textAlign:'center',
+    marginTop:20,
+  }
 });

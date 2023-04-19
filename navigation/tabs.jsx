@@ -46,18 +46,6 @@ const Tabs = () => {
               </Text>
             </View>
           ),
-          headerShown: true,
-          headerStyle: {
-            backgroundColor: '#51087E',
-            height:80,
-          },
-          headerTintColor: '#ffffff',
-          headerTitle: 'Conventia',
-          headerTitleStyle: {
-            fontSize: 27, 
-            fontFamily: "serif",
-            fontWeight: "bold",
-          },
         }}
       />
       <Tab.Screen

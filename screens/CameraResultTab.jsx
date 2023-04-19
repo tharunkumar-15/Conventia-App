@@ -29,7 +29,6 @@ function CameraResultTab() {
       console.log(image.path);
       setImagePath(image.path);
       setPhotoTaken(true);
-      navigation.navigate("CameraResultTab");
     }).catch(() => {
       navigation.navigate("Home", { screen: 'UserPage' });
     });
