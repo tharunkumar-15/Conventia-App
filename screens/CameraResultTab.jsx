@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image,ActivityIndicator } from 'react-native';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import CustomButton from '../CustomButton';
 import PreviousConverstionTab from './PreviousConversationTab';
@@ -19,8 +19,25 @@ function CameraResultTab() {
   const [imagePath, setImagePath] = useState('');
   const [photoTaken, setPhotoTaken] = useState(false);
   const [isImageUploaded, setIsImageUploaded] = useState(false);
+  const [response, setResponse] = useState("");
+  const [loading,setLoading]=useState(true);
+
+  // useEffect(()=>{
+  //   loadingscreen();
+  // },[])
+
+  // const loadingscreen=()=>{
+  //   console.log("loadingscreen called");
+  //   setLoading(!loading)
+  // }
+
+  useEffect(()=>{
+    console.log("UseEffect called for response");
+    responsedata();
+  },[response])
 
   const uploadimage = async () => {
+    setLoading(true);
     console.log('upload function called');
     const blobImage = await new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
@@ -45,30 +62,54 @@ function CameraResultTab() {
       blobImage,
       metadata,
     );
-
     const downloadURL = await getDownloadURL(snapshot.ref);
-
+    
     console.log("Download URL : ", downloadURL)
-    axios.post(`http://10.0.2.2:5000/predict-face?id=${user}`, { url: downloadURL })
-      .then(response => {
-        // Handle the response datarr
-        console.log("Response: ", response.data);
-        //store it in useState 
-        //TODO
-        // detectedFace
-        // initial value of useState: {face:''}
-        // {face:'Face not found'}
-        // {face:'Unknown'}
-        // {face:'12345tascuygadua'}
-      })
-      .catch(error => {
-        // Handle any errors that occurred
-        console.log("Error: ", error.response.data)
-        console.error(error);
-      });
+    setResponse("aYPgBM0d33kNseejSZP3");
+    console.log("Response:",response)
+    // axios.post(`http://10.0.2.2:5000/predict-face?id=${user}`, { url: downloadURL })
+    //   .then(response => {
+    //     // Handle the response datarr
+    //     console.log("Response: ", response.data);
+    //     setResponse("Unknown face");
+    //     //store it in useState 
+    //     //TODO
+    //     // detectedFace
+    //     // initial value of useState: {face:''}
+    //     // {face:'Face not found'}
+    //     // {face:'Unknown'}
+    //     // {face:'12345tascuygadua'}
+    //   })
+      // .catch(error => {
+      //   console.log("Error: ", error.response.data)
+      //   console.error(error);
+      // });
 
     setIsImageUploaded(true); // <-- Set state variable to true after image upload
   };
+
+  const responsedata=()=>{
+    if(response=='Unknown')
+    {
+      setLoading(false);
+      console.log("Called inside response of unknown")
+      navigation.navigate("Home", { screen: 'UserPage' });
+    }
+    else if(response=='Face not found')
+    {
+      setLoading(false);
+      navigation.navigate("Home", { screen: 'UserPage' });
+    }
+    else if(response!='')
+    {
+       setLoading(false);
+       console.log(response)
+    }
+    // else
+    // {
+    //   navigation.navigate("CameraResultTab");
+    // }
+  }
 
   useEffect(() => {
     if (imagePath !== '' && !isImageUploaded) {
@@ -122,39 +163,47 @@ function CameraResultTab() {
 
   return (
     <View style={styles.usercontainer}>
-      <Text style={styles.welcometext}>Details of detected face</Text>
-      {imagePath ? (
-        <Image
-          source={{ uri: `file://${imagePath}` }}
-          style={styles.loginimage}
-          resizeMode="stretch"
-        />
-      ) : null}
-      <Text style={styles.detecteddetails}>Surya S</Text>
-      <Text style={styles.detecteddetails}>Friend</Text>
-      <CustomButton
-        buttonTitle="Access Previous Conversations"
-        buttonStyle={{
-          width: '50%',
-        }}
-        textstyle={{
-          fontSize: 16,
-        }}
-        onPress={() => navigation.navigate(PreviousConverstionTab)}
-      />
-      <CustomButton
-        buttonTitle="Start Recording a new Conversation"
-        buttonStyle={{
-          width: '50%',
-          padding: 12,
-        }}
-        textstyle={{
-          fontSize: 16,
-        }}
-        onPress={() => navigation.navigate(NewConversationTab)}
-      />
+      {loading? (
+        <View>
+          <ActivityIndicator size="large" color="black" />
+        </View>
+      ) : (
+        <React.Fragment>
+          <Text style={styles.welcometext}>Details of detected face</Text>
+          {imagePath ? (
+            <Image
+              source={{ uri: `file://${imagePath}` }}
+              style={styles.loginimage}
+              resizeMode="stretch"
+            />
+          ) : null}
+          <Text style={styles.detecteddetails}>Surya S</Text>
+          <Text style={styles.detecteddetails}>Friend</Text>
+          <CustomButton
+            buttonTitle="Access Previous Conversations"
+            buttonStyle={{
+              width: '50%',
+            }}
+            textstyle={{
+              fontSize: 16,
+            }}
+            onPress={() => navigation.navigate(PreviousConverstionTab)}
+          />
+          <CustomButton
+            buttonTitle="Start Recording a new Conversation"
+            buttonStyle={{
+              width: '50%',
+              padding: 12,
+            }}
+            textstyle={{
+              fontSize: 16,
+            }}
+            onPress={() => navigation.navigate(NewConversationTab)}
+          />
+        </React.Fragment>
+      )}
     </View>
-  );
+  );  
 }
 
 export default CameraResultTab;

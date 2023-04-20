@@ -22,6 +22,7 @@ import {db} from '../config';
 import {collection, addDoc} from 'firebase/firestore';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
+import {ref, getDownloadURL, uploadBytesResumable} from 'firebase/storage';
 
 const NewConversationTab = ({navigation}) => {
   const [audioFile, setAudioFile] = useState('');
@@ -32,13 +33,13 @@ const NewConversationTab = ({navigation}) => {
   const [title, setTitle] = useState('');
   // const [loaded, setLoaded] = useState(false);
   // let sound = null;
-
+  
   const [recording, setRecording] = useState(false);
   const {user} = useSelector(state => state.useReducer);
   const animationHandler = () => {
     setRecording(!recording);
   };
-
+  let audiopath="";
   useEffect(() => {
     if (recording) start();
     else stop();
@@ -84,16 +85,17 @@ const NewConversationTab = ({navigation}) => {
   };
 
   const start = () => {
-    setAudioFile('');
+    //setAudioFile('');
     setRecording(true);
     // setLoaded(false);
     AudioRecord.start();
   };
 
   const stop = async () => {
-    let audioFile = await AudioRecord.stop();
-    console.log('audioFile', audioFile);
-    setAudioFile(audioFile);
+    audiopath = await AudioRecord.stop();
+    console.log('audioFile',audiopath);
+    setAudioFile(audiopath);
+    console.log('audiopathstate:',audioFile);
     setRecording(false);
     modalHandler();
   };
@@ -106,6 +108,21 @@ const NewConversationTab = ({navigation}) => {
     setImportant(!important);
   };
 
+
+  const uploadAudio = async () => {
+    try {
+      // Upload audio file to Firebase storage
+      console.log("uploadaudio function called");
+      console.log("audiopath inside function:", audioFile);
+      const storageRef = ref(db, 'ConversatioAudio/' + audioFile); // Replace 'audioFiles/' with your desired storage path
+      const response = await uploadBytesResumable(storageRef, audioFile);
+      console.log('File uploaded successfully!', response);
+    } catch (error) {
+      console.error('Error uploading file: ', error);
+    }
+    // Set state variable to true after audio upload
+  };
+  
   // const submitdata = () => {
   //   console.log('Title:', title);
   //   const appointquery = collection(
@@ -217,7 +234,7 @@ const NewConversationTab = ({navigation}) => {
                 )}
               </TouchableOpacity>
             </View>
-            <CustomButton buttonTitle="Submit" onPress={() => {}} />
+            <CustomButton buttonTitle="Submit" onPress={() => uploadAudio()} />
           </View>
         </View>
       </Modal>
