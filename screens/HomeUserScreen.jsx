@@ -4,6 +4,7 @@ import ImportantTab from './ImportantTab'
 import {db} from '../config';
 import {doc,onSnapshot} from 'firebase/firestore';
 import {useSelector} from 'react-redux';
+
 export default function HomeUserScreen() {
   const [userdata, setUserdata] = useState([]);
   const {user} = useSelector(state => state.useReducer);
@@ -18,6 +19,7 @@ export default function HomeUserScreen() {
       onSnapshot(UserRef, (doc) => {
         setUserdata(doc.data());
       });
+      console.log(userdata)
     } catch (error) {
       console.log(error);
     }
@@ -36,7 +38,7 @@ export default function HomeUserScreen() {
              Welcome 
           </Text>
            <Text style={styles.headername}>
-               {userdata && userdata.Name}
+               {userdata&&userdata.Name}
            </Text>
         </View>
         <View style={styles.uright}>
@@ -86,7 +88,7 @@ const styles = StyleSheet.create({
  },
  ushapecontainer:{
    flexDirection:'row',
-   height:300,
+   height:250,
    backgroundColor: '#51087E',
  },
  uleft:{

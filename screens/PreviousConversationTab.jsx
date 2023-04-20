@@ -57,6 +57,7 @@ function PreviousConverstionTab(props) {
         id: conversationDoc.id,
       }));
       setData(conversationsData);
+      console.log("previous data:",data)
       setModalStates(new Array(conversationsData.length).fill(false));
     });
     return () => unsubscribe();
@@ -143,7 +144,7 @@ function PreviousConverstionTab(props) {
           <View style={styles.rightdetails}>
             <Text style={styles.details}>Name:{RelativeName}</Text>
             <Text style={styles.details}>Relation: {Relation}</Text>
-            <CustomButton
+            {/* <CustomButton
               buttonTitle="Remove Person"
               buttonStyle={{
                 width: '65%',
@@ -152,14 +153,14 @@ function PreviousConverstionTab(props) {
               textstyle={{
                 fontSize: 15,
               }}
-            />
+            /> */}
           </View>
         </View>
         <Text style={styles.details}>Recordings</Text>
         <View style={styles.recordingdetails}>
           {data.map((info, index) =>(
             <View key={index} style={styles.cardstyle}>
-              <CustomCard info={info} modalStates={modalStates} setModalStates={setModalStates}index={index} setData={setData}/>
+              <CustomCard info={info} modalStates={modalStates} setModalStates={setModalStates} index={index} setData={setData}/>
             </View>
           ))}
         </View>

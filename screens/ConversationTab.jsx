@@ -50,9 +50,9 @@ function ConversationTab({navigation}) {
               <CustomButton
                 buttonTitle="More Info"
                 buttonStyle={{
-                  width: '80%',
-                  backgroundColor:"#f95999",
-                  marginLeft:10,
+                width: '80%',
+                backgroundColor:"#f95999",
+                marginLeft:10,
                 }}
                 onPress={() => navigation.navigate("Camera",{screen:'PreviousConverstionTab',params:{cards:cards}})}
                 // onPress={() => navigation.navigate('Camera',{screen:'PreviousConverstionTab'},{cards})}

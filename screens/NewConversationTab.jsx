@@ -42,7 +42,7 @@ const NewConversationTab = ({navigation}) => {
   const animationHandler = () => {
     setRecording(!recording);
   };
-
+  let audiopath="";
   useEffect(() => {
     if (recording) start();
     else stop();

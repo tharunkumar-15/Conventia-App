@@ -74,21 +74,16 @@ export default function CustomCard({
   return (
     <View style={styles.cards}>
       <Text style={styles.remaininfo} numberOfLines={2}>
-        {info.SummaryDate?.seconds && (
-          <Text style={styles.remaininfo} numberOfLines={2}>
-            {format(
-              new Date(info.SummaryDate.seconds * 1000),
-              'MMM d, yyyy h:mm a',
-            )}
-            : {info.Summary}
+          <Text>
+          {info.SummaryDate&&info.SummaryDate}
+            :{info.SummaryTitle}
           </Text>
-        )}
       </Text>
       <Text style={styles.remaininfo} numberOfLines={2}>
-        {relativeName}
+        {relativeName&&relativeName}
       </Text>
       <Text style={styles.remaininfo} numberOfLines={2}>
-        {relativeRelation}
+        {relativeRelation&&relativeRelation}
       </Text>
       <View style={styles.logostyle}>
         <AntDesign
