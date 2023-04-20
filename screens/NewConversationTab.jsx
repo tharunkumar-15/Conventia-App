@@ -5,26 +5,40 @@ import AudioRecord from 'react-native-audio-record';
 import {
   View,
   PermissionsAndroid,
-  Button,
   Pressable,
   StyleSheet,
+  Modal,
+  Text,
+  TouchableOpacity,
 } from 'react-native';
 import {MotiView} from '@motify/components';
 import {Easing} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/SimpleLineIcons';
+import CustomInput from '../CustomInput';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import CustomButton from '../CustomButton';
+import {useSelector} from 'react-redux';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import {auth, db, storage} from '../config';
 import {collection, addDoc} from 'firebase/firestore';
-import {useSelector} from 'react-redux';
 import {ref, getDownloadURL, uploadBytesResumable} from 'firebase/storage';
-import { error } from 'console';
+import {error} from 'console';
 
 const NewConversationTab = ({navigation}) => {
-  // const [audioFile, setAudioFile] = useState('Demo');
-  // const [loaded, setLoaded] = useState(false);
-  let audio='';
-  const [recording, setRecording] = useState(false);
+  const [audioFile, setAudioFile] = useState('');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [dropdownValue, setDropdownValue] = useState('true');
+  const [important, setImportant] = useState(false);
 
+  const [title, setTitle] = useState('');
+  // const [loaded, setLoaded] = useState(false);
+  let audio = '';
+  let downloadURL =
+    'https://firebasestorage.googleapis.com/v0/b/conventia-application.appspot.com/o/ConversationAudio%2Fpaint.wav?alt=media&token=e6cb0eb0-20e3-4dbc-ab08-a0e8847f3bd6';
+
+  const [recording, setRecording] = useState(false);
+  const {user} = useSelector(state => state.useReducer);
   const animationHandler = () => {
     setRecording(!recording);
   };
@@ -53,18 +67,6 @@ const NewConversationTab = ({navigation}) => {
     initAudioRecord();
   }, []);
 
-  // useEffect(() =>{
-  //   if(audiopath!='')
-  //   axios.get(`https://127.0.0.1:5000/perform-diarization?id=${user}&url=${audiopath}`)
-  //   .then(response => {
-  //     console.log("AudioResponse: ", response.data)
-  //   })
-  //   .catch(error => {
-  //     console.log("AudioError: ", response.data)
-  //     console.error(error);
-  //   });
-  // },[audiopath]);
-
   const checkPermission = async () => {
     const granted = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
@@ -87,7 +89,7 @@ const NewConversationTab = ({navigation}) => {
 
   const sendaudio = async () => {
     console.log('upload function called');
-    console.log("AudioFiePathUploading: ",audio)
+    console.log('AudioFiePathUploading: ', audio);
     const blobAudio = await new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.onload = function () {
@@ -122,11 +124,61 @@ const NewConversationTab = ({navigation}) => {
 
   const stop = async () => {
     audio = await AudioRecord.stop();
-    console.log('audiopathcheck',audio);
+    console.log('audiopathcheck', audio);
     //setAudioFile(audiopath);
     setRecording(false);
-    sendaudio();
+    modalHandler();
   };
+
+  const modalHandler = () => {
+    setModalOpen(!modalOpen);
+  };
+
+  const toggleHandler = () => {
+    setImportant(!important);
+  };
+
+  const submitdata = () => {
+    axios
+      .post(`https://127.0.0.1:5000/perform-summarization`, {
+        id: user,
+        url: downloadURL,
+        relativename: 'Suhas',
+        title: title,
+        important: important,
+      })
+      .then(response => {
+        console.log('AudioResponse: ', response.data);
+      })
+      .catch(error => {
+        console.log('AudioError: ', response.data);
+        console.error(error);
+      });
+    modalHandler();
+  };
+  // const submitdata = () => {
+  //   console.log('Title:', title);
+  //   const appointquery = collection(
+  //     db,
+  //     'Users',
+  //     user,
+  //     'Relatives',
+  //     'vcXSI5Ge9zpSyZF4VZin',
+  //     'RecordedConversation',
+  //   );
+  //   addDoc(appointquery, {
+  //     Title: title,
+  //     Important:important,
+  //   })
+  //     .then(() => {
+  //       setTitle(''); // <-- Reset the title state to an empty string
+  //       modalHandler();
+  //       alert('Data sent successfully');
+  //     })
+  //     .catch(error => {
+  //       console.log(error);
+  //     });
+  // };
 
   // const load = () => {
   //   return new Promise((resolve, reject) => {
@@ -187,6 +239,38 @@ const NewConversationTab = ({navigation}) => {
         />
       </Pressable>
       {/* <Button onPress={play} title="Play" disabled={!audioFile}/> */}
+      <Modal
+        visible={modalOpen}
+        onRequestClose={() => modalHandler()}
+        animationType="fade"
+        transparent={true}>
+        <View style={styles.container}>
+          <View style={styles.modalcontent}>
+            <CustomInput
+              placeholderText="Title"
+              autoCapitalize="none"
+              autoCorrect={false}
+              Icon={MaterialIcons}
+              Icontype="title"
+              onChangeText={text => setTitle(text)}
+              value={title}
+            />
+            <View style={styles.tooglecontainer}>
+              <Text style={styles.toggleText}>Important Conversation:</Text>
+              <TouchableOpacity
+                style={styles.toggleicon}
+                onPress={toggleHandler}>
+                {important ? (
+                  <FontAwesome name="toggle-on" size={30} color="black" />
+                ) : (
+                  <FontAwesome name="toggle-off" size={30} color="black" />
+                )}
+              </TouchableOpacity>
+            </View>
+            <CustomButton buttonTitle="Submit" onPress={submitdata} />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -203,5 +287,38 @@ const styles = StyleSheet.create({
   center: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  modalcontent: {
+    backgroundColor: '#F8F6F3',
+    width: '90%',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    position: 'relative',
+  },
+  toggleText: {
+    color: 'black',
+    fontSize: 19,
+    fontWeight: 'bold',
+    marginTop: 15,
+    marginBottom: 18,
+  },
+  toggleicon: {
+    marginLeft: 10,
+    marginTop: 10,
+  },
+  tooglecontainer: {
+    flexDirection: 'row',
   },
 });

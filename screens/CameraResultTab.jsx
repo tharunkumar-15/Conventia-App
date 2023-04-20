@@ -6,6 +6,11 @@ import PreviousConverstionTab from './PreviousConversationTab';
 import NewConversationTab from './NewConversationTab';
 import ImagePicker from 'react-native-image-crop-picker';
 import { useSelector } from 'react-redux';
+import axios from 'axios';
+import { ref, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
+import { auth, db, storage } from '../config';
+import { doc, getDoc, updateDoc, onSnapshot } from 'firebase/firestore';
+import { detect } from '../Face Recognition/env/Lib/site-packages/cmake/data/doc/cmake/html/_static/underscore-1.3.1';
 
 function CameraResultTab() {
   const navigation = useNavigation();
@@ -13,6 +18,69 @@ function CameraResultTab() {
   const { user } = useSelector(state => state.useReducer);
   const [imagePath, setImagePath] = useState('');
   const [photoTaken, setPhotoTaken] = useState(false);
+  const [isImageUploaded, setIsImageUploaded] = useState(false);
+
+  const uploadimage = async () => {
+    console.log('upload function called');
+    const blobImage = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function () {
+        reject(new TypeError('Newtork error failed'));
+      };
+      xhr.responseType = 'blob';
+      xhr.open('GET', imagePath, true);
+      xhr.send(null);
+    });
+
+    const metadata = {
+      contentType: 'image/jpeg',
+    };
+
+    const storageRef = ref(storage, 'PredictFace/' + Date.now());
+    const snapshot = await uploadBytesResumable(
+      storageRef,
+      blobImage,
+      metadata,
+    );
+
+    const downloadURL = await getDownloadURL(snapshot.ref);
+
+    console.log("Download URL : ", downloadURL)
+    axios.post(`http://localhost:5000/predict-face?id=${user}`, { url: downloadURL })
+      .then(response => {
+        // Handle the response datarr
+        console.log("Response: ", response.data);
+        //store it in useState 
+        //TODO
+        // detectedFace
+        // initial value of useState: {face:''}
+        // {face:'Face not found'}
+        // {face:'Unknown'}
+        // {face:'12345tascuygadua'}
+      })
+      .catch(error => {
+        // Handle any errors that occurred
+        console.log("Error: ", error.response.data)
+        console.error(error);
+      });
+
+    setIsImageUploaded(true); // <-- Set state variable to true after image upload
+  };
+
+  useEffect(() => {
+    if (imagePath !== '' && !isImageUploaded) {
+      // <-- Add check for isImageUploaded
+      uploadimage();
+      setImagePath('');
+    } else if (isImageUploaded) {
+      // <-- Reset state variable to false after image upload
+      setIsImageUploaded(false);
+    }
+  }, [imagePath, isImageUploaded]);
+
 
   useEffect(() => {
     if (isFocused) {
@@ -30,7 +98,6 @@ function CameraResultTab() {
       console.log(image.path);
       setImagePath(image.path);
       setPhotoTaken(true);
-      navigation.navigate("CameraResultTab");
     }).catch(() => {
       navigation.navigate("Home", { screen: 'UserPage' });
     });
