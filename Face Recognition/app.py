@@ -3,6 +3,7 @@ from flask import Flask,request,jsonify
 from werkzeug.utils import secure_filename
 import recognition as faceRecognition
 import speech_diarization
+import summarization
 import numpy
 import cv2
 from firebase_admin import credentials,initialize_app,firestore
@@ -85,11 +86,12 @@ def predictFace():
 def speechDiarization():
   data = request.get_json()
   DiarizationResult= speech_diarization.startDiarization(data['url'],data['UserName'],data['RelativeName'])
+  SummarizationResult= summarization.perform_summarization(DiarizationResult)
   currentDate = datetime.datetime.now()
   formattedDate=((currentDate.strftime("%d-%m-%Y"))+" "+currentDate.strftime("%I:%M:%S %p"))
-  finalresult=postSummarizedText(data['userId'],data['RelativeId'],data['Important'],data['SummaryTitle'],DiarizationResult,formattedDate)
+  finalresult=postSummarizedText(data['userId'],data['RelativeId'],data['Important'],data['SummaryTitle'],SummarizationResult,formattedDate)
   print(finalresult)
-  return jsonify({'diarization':DiarizationResult})
+  return jsonify({'Summarization':SummarizationResult})
   
 
   

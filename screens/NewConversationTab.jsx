@@ -24,7 +24,7 @@ import {auth, db, storage} from '../config';
 import {collection, addDoc} from 'firebase/firestore';
 import {ref, getDownloadURL, uploadBytesResumable} from 'firebase/storage';
 import {error} from 'console';
-
+import AudioRecorderPlayer from 'react-native-audio-recorder-player'
 const NewConversationTab = ({navigation}) => {
   const [audioFile, setAudioFile] = useState('');
   const [modalOpen, setModalOpen] = useState(false);

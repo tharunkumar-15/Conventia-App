@@ -13,7 +13,7 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CustomButton from '../CustomButton';
 import {auth, db, storage} from '../config';
-import {collection, addDoc} from 'firebase/firestore';
+import {collection, addDoc, updateDoc} from 'firebase/firestore';
 import ImagePicker from 'react-native-image-crop-picker';
 import {useSelector} from 'react-redux';
 import {ref, getDownloadURL, uploadBytesResumable} from 'firebase/storage';
@@ -73,22 +73,44 @@ function AddPeopleTab() {
     );
     const downloadURL = await getDownloadURL(snapshot.ref);
 
+    // const relativesRef = collection(db, 'Users', user, 'Relatives');
+    // const docRef= await addDoc(relativesRef, {
+    //   Relation: relation,
+    //   RelativeName: name,
+    //   ImageUri: downloadURL,
+    // }).then(() => {
+    //   setName('');
+    //   setRelation('');
+    //   setImage(
+    //     'https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg',
+    //   );
+    //   setShowloader(false);
+    //   ToastAndroid.show('Relative Added',ToastAndroid.SHORT,ToastAndroid.BOTTOM)
+    // });
+
+
+
     const relativesRef = collection(db, 'Users', user, 'Relatives');
-    await addDoc(relativesRef, {
+    const newDocRef = await addDoc(relativesRef, {
       Relation: relation,
       RelativeName: name,
       ImageUri: downloadURL,
     }).then(() => {
-      setName('');
-      setRelation('');
-      setImage(
-        'https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg',
-      );
-      setShowloader(false);
-      ToastAndroid.show('Relative Added',ToastAndroid.SHORT,ToastAndroid.BOTTOM)
-    });
+     setName('');
+     setRelation('');
+     setImage(
+       'https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg',
+     );
+     
+   });
 
-    console.log('downloadURL', downloadURL);
+   const docId = newDocRef.id;
+   await updateDoc(newDocRef, { Id: docId });
+   console.log('Document created with ID:', docId);
+   console.log('downloadURL', downloadURL);
+
+   setShowloader(false);
+   ToastAndroid.show('Relative Added',ToastAndroid.SHORT,ToastAndroid.BOTTOM);
   };
 
   return (
