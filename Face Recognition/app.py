@@ -2,6 +2,8 @@ from email.policy import default
 from flask import Flask,request,jsonify
 from werkzeug.utils import secure_filename
 import recognition as faceRecognition
+import speech_diarization
+import summarization
 import numpy
 import cv2
 from firebase_admin import credentials,initialize_app,firestore
@@ -10,14 +12,14 @@ import requests
 from io import BytesIO
 from urllib.request import urlopen
 import requests
+import datetime
 from PIL import Image
 from flask_cors import CORS
-
 
 cred=credentials.Certificate("key.json")
 default_app=initialize_app(cred)
 db=firestore.client()
-app = Flask(__name__)
+app=Flask(__name__)
 CORS(app)
 
 def getRelativesImages(userId):
@@ -37,9 +39,24 @@ def getRelativesImages(userId):
       return f"Tharun error An error occured: {e}"
     return relativeImages
 
+def postSummarizedText(userId, RelativeId, Important, SummaryTitle,Summary,SummaryDate):
+  try:
+    userConversation=db.collection('Users').document(userId).collection('Relatives').document(RelativeId).collection('RecordedConversation').document()
+    userConversation.set({
+      'Important':Important,
+      'RelativeId':RelativeId,
+      'SummaryTitle':SummaryTitle,
+      'Summary':Summary,
+      'SummaryDate':SummaryDate
+    })
+  except Exception as e:
+    return f"Sending Data Error: {e}"
+  return f"Success"
+
 
 @app.route('/predict-face',methods=['POST'])
 def predictFace():
+  print("predict fun called")
   userId=request.args.get('id')
   data = request.get_json()
   print("user image: ",data['url'])
@@ -69,6 +86,20 @@ def predictFace():
 #     images=getRelativesImages(userId)
 #     predictedFace=faceRecognition.predictFace(img,images)
 #     return jsonify({'face':predictedFace})
+
+@app.route('/perform-summarization',methods=['POST'])
+def speechDiarization():
+  data = request.get_json()
+  DiarizationResult= speech_diarization.startDiarization(data['url'],data['UserName'],data['RelativeName'])
+  SummarizationResult= summarization.perform_summarization(DiarizationResult)
+  currentDate = datetime.datetime.now()
+  formattedDate=((currentDate.strftime("%d-%m-%Y"))+" "+currentDate.strftime("%I:%M:%S %p"))
+  finalresult=postSummarizedText(data['userId'],data['RelativeId'],data['Important'],data['SummaryTitle'],SummarizationResult,formattedDate)
+  print(finalresult)
+  return jsonify({'Summarization':SummarizationResult})
+  
+
+  
 
 if __name__=='__main__':
   app.run(debug=True)
