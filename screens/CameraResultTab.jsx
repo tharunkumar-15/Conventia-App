@@ -67,23 +67,23 @@ function CameraResultTab() {
     console.log("Download URL : ", downloadURL)
     setResponse("aYPgBM0d33kNseejSZP3");
     console.log("Response:",response)
-    // axios.post(`http://10.0.2.2:5000/predict-face?id=${user}`, { url: downloadURL })
-    //   .then(response => {
-    //     // Handle the response datarr
-    //     console.log("Response: ", response.data);
-    //     setResponse("Unknown face");
-    //     //store it in useState 
-    //     //TODO
-    //     // detectedFace
-    //     // initial value of useState: {face:''}
-    //     // {face:'Face not found'}
-    //     // {face:'Unknown'}
-    //     // {face:'12345tascuygadua'}
-    //   })
-      // .catch(error => {
-      //   console.log("Error: ", error.response.data)
-      //   console.error(error);
-      // });
+    axios.post(`http://192.168.2.101:5000/predict-face?id=${user}`, { url: downloadURL })
+      .then(response => {
+        // Handle the response datarr
+        console.log("Response: ", response.data);
+        // setResponse("Unknown face");
+        //store it in useState 
+        //TODO
+        // detectedFace
+        // initial value of useState: {face:''}
+        // {face:'Face not found'}
+        // {face:'Unknown'}
+        // {face:'12345tascuygadua'}
+      })
+      .catch(error => {
+        console.log("Error: ", error.response.data)
+        console.error(error);
+      });
 
     setIsImageUploaded(true); // <-- Set state variable to true after image upload
   };

@@ -14,11 +14,13 @@ from urllib.request import urlopen
 import requests
 import datetime
 from PIL import Image
+from flask_cors import CORS
 
 cred=credentials.Certificate("key.json")
 default_app=initialize_app(cred)
 db=firestore.client()
 app=Flask(__name__)
+CORS(app)
 
 def getRelativesImages(userId):
     try:
@@ -97,4 +99,4 @@ def speechDiarization():
   
 
 if __name__=='__main__':
-  app.run(debug=True,host='localhost')
+  app.run(debug=True)

@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {Buffer} from 'buffer';
+import mime from 'mime';
 import Permissions from 'react-native-permissions';
 import AudioRecord from 'react-native-audio-record';
 import {
@@ -10,6 +11,8 @@ import {
   Modal,
   Text,
   TouchableOpacity,
+  Button,
+  ToastAndroid,
 } from 'react-native';
 import {MotiView} from '@motify/components';
 import {Easing} from 'react-native-reanimated';
@@ -21,114 +24,69 @@ import {useSelector} from 'react-redux';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import {auth, db, storage} from '../config';
-import {collection, addDoc} from 'firebase/firestore';
-import {ref, getDownloadURL, uploadBytesResumable} from 'firebase/storage';
-import {error} from 'console';
-import AudioRecorderPlayer from 'react-native-audio-recorder-player'
+import {
+  ref,
+  getDownloadURL,
+  uploadBytesResumable,
+  getStorage,
+  uploadBytes,
+} from 'firebase/storage';
+import AudioRecorderPlayer from 'react-native-audio-recorder-player';
+import Sound from 'react-native-sound';
+import RNFS from 'react-native-fs';
+import RNFetchBlob from 'rn-fetch-blob';
+
 const NewConversationTab = ({navigation}) => {
-  const [audioFile, setAudioFile] = useState('');
-  const [modalOpen, setModalOpen] = useState(false);
-  const [dropdownValue, setDropdownValue] = useState('true');
-  const [important, setImportant] = useState(false);
-
-  const [title, setTitle] = useState('');
-  // const [loaded, setLoaded] = useState(false);
-  let audio = '';
-  let downloadURL =
-    'https://firebasestorage.googleapis.com/v0/b/conventia-application.appspot.com/o/ConversationAudio%2Fpaint.wav?alt=media&token=e6cb0eb0-20e3-4dbc-ab08-a0e8847f3bd6';
-
-  const [recording, setRecording] = useState(false);
   const {user} = useSelector(state => state.useReducer);
-  const animationHandler = () => {
-    setRecording(!recording);
-  };
-  let audiopath="";
-  useEffect(() => {
-    if (recording) start();
-    else stop();
-  }, [recording]);
+  const [userdata, setUserdata] = useState([]);
+  const [recorderPlayer, setRecorderPlayer] = useState(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioPath, setAudioPath] = useState('');
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [downloadURL, setDownloadURL] = useState('');
+  const [important, setImportant] = useState(false);
+  const [title, setTitle] = useState('');
 
   useEffect(() => {
-    const initAudioRecord = async () => {
-      await checkPermission();
-      const options = {
-        sampleRate: 16000,
-        channels: 1,
-        bitsPerSample: 16,
-        wavFile: 'test.wav',
-      };
-
-      AudioRecord.init(options);
-
-      AudioRecord.on('data', data => {
-        const chunck = Buffer.from(data, 'base64');
-      });
+    // Initialize AudioRecorderPlayer
+    const initRecorderPlayer = async () => {
+      const player = new AudioRecorderPlayer();
+      await player.setSubscriptionDuration(0.1); // Set subscription duration for real-time recording updates
+      setRecorderPlayer(player);
     };
-    initAudioRecord();
+    initRecorderPlayer();
   }, []);
 
-  const checkPermission = async () => {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-      {
-        title: 'Microphone Permission',
-        message: 'Needs access to your microphone',
-        buttonNeutral: 'Ask me Later',
-        buttonNegative: 'Cancel',
-        buttonPositive: 'OK',
-      },
-    );
-    const p = await Permissions.check('microphone');
-    if (p === 'authorized') return;
-    return requestPermission();
+  const startRecording = async () => {
+    // setIsRecording(true);
+    // const path = `${RNFS.DocumentDirectoryPath}/audio.mp3`; // Specify the file path for the recorded audio
+    const path = `${RNFS.DocumentDirectoryPath}/audio.wav`; // Specify the file path for the recorded audio
+    await recorderPlayer.startRecorder(path);
   };
 
-  const requestPermission = async () => {
-    const p = await Permissions.request('microphone');
+  const stopRecording = async () => {
+    // setIsRecording(false);
+    const result = await recorderPlayer.stopRecorder(); // Stop recording
+    console.log('The result is:', result);
+    setAudioPath(result); // Set the audio path to the recorded audio file
   };
 
-  const sendaudio = async () => {
-    console.log('upload function called');
-    console.log('AudioFiePathUploading: ', audio);
-    const blobAudio = await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.onload = function () {
-        resolve(xhr.response);
-      };
-      xhr.onerror = function () {
-        reject(new TypeError('Newtork error failed'));
-      };
-      xhr.responseType = 'blob';
-      xhr.open('GET', audio, true);
-      xhr.send(null);
-    });
+  useEffect(() => {
+    if (audioPath != '') {
+      uploadAudio();
+      modalHandler();
+    }
+  }, [audioPath]);
 
-    const metadata = {
-      contentType: 'audio/wav',
-    };
-
-    const storageRef = ref(storage, 'ConversationAudio/' + Date.now());
-    const snapshot = await uploadBytesResumable(
-      storageRef,
-      blobAudio,
-      metadata,
-    );
-    const downloadAudioURL = await getDownloadURL(snapshot.ref);
-    console.log('downloadAudioURL: ', downloadAudioURL);
+  const animationHandler = () => {
+    setIsRecording(!isRecording);
   };
 
-  const start = () => {
-    setRecording(true);
-    AudioRecord.start();
-  };
-
-  const stop = async () => {
-    audio = await AudioRecord.stop();
-    console.log('audiopathcheck', audio);
-    //setAudioFile(audiopath);
-    setRecording(false);
-    modalHandler();
-  };
+  useEffect(() => {
+    if (isRecording) startRecording();
+    else stopRecording();
+  }, [isRecording]);
 
   const modalHandler = () => {
     setModalOpen(!modalOpen);
@@ -138,14 +96,69 @@ const NewConversationTab = ({navigation}) => {
     setImportant(!important);
   };
 
+  const uploadAudio = async () => {
+    console.log('upload function called');
+    if (audioPath) {
+      console.log('upload function called');
+      console.log('AudioFilePathUploading: ', audioPath);
+      const blobAudio = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+          resolve(xhr.response);
+        };
+        xhr.onerror = function () {
+          reject(new TypeError('Newtork error failed'));
+        };
+        xhr.responseType = 'blob';
+        xhr.open('GET', audioPath, true);
+        xhr.send(null);
+      });
+
+      const metadata = {
+        contentType: 'audio/wav',
+      };
+
+      // const storageRef = ref(storage, 'ConversationAudio/' + Date.now());
+      const storageRef = ref(storage, 'ConversationAudio/' + 'audio');
+      const snapshot = await uploadBytesResumable(
+        storageRef,
+        blobAudio,
+        metadata,
+      );
+      const AudiodownloadURL = await getDownloadURL(snapshot.ref);
+      setDownloadURL(AudiodownloadURL);
+      console.log('downloadAudioURL: ', AudiodownloadURL);
+    }
+  };
+
+  useEffect(()=>{
+    Userdata();
+  },[])
+
+  const Userdata = async () => {
+    try {
+      const UserRef = doc(db, 'Users', user);
+      onSnapshot(UserRef, (doc) => {
+        setUserdata(doc.data());
+      });
+      console.log(userdata)
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const submitdata = () => {
+    modalHandler();
+    console.log("Axios is working");
     axios
-      .post(`https://127.0.0.1:5000/perform-summarization`, {
-        id: user,
+      .post(`http://192.168.2.101:5000/perform-summarization`, {
+        userId: user,
+        UserName: userdata.Name,
+        RelativeId: 'vcXSI5Ge9zpSyZF4VZin',
+        RelativeName: 'Tarun',
         url: downloadURL,
-        relativename: 'Suhas',
-        title: title,
-        important: important,
+        SummaryTitle: title,
+        Important: important,
       })
       .then(response => {
         console.log('AudioResponse: ', response.data);
@@ -154,65 +167,46 @@ const NewConversationTab = ({navigation}) => {
         console.log('AudioError: ', response.data);
         console.error(error);
       });
-    modalHandler();
+    ToastAndroid.show(
+      'Conversation will be added soon',
+      ToastAndroid.SHORT,
+      ToastAndroid.BOTTOM,
+    );
   };
-  // const submitdata = () => {
-  //   console.log('Title:', title);
-  //   const appointquery = collection(
-  //     db,
-  //     'Users',
-  //     user,
-  //     'Relatives',
-  //     'vcXSI5Ge9zpSyZF4VZin',
-  //     'RecordedConversation',
-  //   );
-  //   addDoc(appointquery, {
-  //     Title: title,
-  //     Important:important,
-  //   })
-  //     .then(() => {
-  //       setTitle(''); // <-- Reset the title state to an empty string
-  //       modalHandler();
-  //       alert('Data sent successfully');
-  //     })
-  //     .catch(error => {
-  //       console.log(error);
-  //     });
-  // };
 
-  // const load = () => {
-  //   return new Promise((resolve, reject) => {
-  //     if (!audioFile) {
-  //       return reject('file path is empty');
-  //     }
+  const playAudio = async () => {
+    if (audioPath) {
+      setIsPlaying(true);
 
-  //     sound = new Sound(audioFile, '', (error) => {
-  //       if (error) {
-  //         console.log('failed to load the file', error);
-  //         return reject(error);
-  //       }
-  //       setLoaded(true);
-  //       return resolve();
-  //     });
-  //   });
-  // };
+      const sound = new Sound(audioPath, '', error => {
+        if (error) {
+          console.error('Failed to load the sound', error);
+          setIsPlaying(false);
+        } else {
+          sound.play(() => {
+            setIsPlaying(false);
+            sound.release();
+          });
+        }
+      });
+    }
+  };
 
-  // const play = async () => {
-  //   if (!loaded) {
-  //     try {
-  //       await load();
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
-  //   Sound.setCategory('Playback');
-  //   sound.play();
-  // };
+  useEffect(() => {
+    console.log('The path of audio is: ', audioPath);
+  }, [audioPath]);
 
   return (
+    // <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+    //   <Button onPress={startRecording} title="Start Recording" />
+    //   <Button onPress={stopRecording} title="Stop Recording" />
+    //   <Button onPress={playAudio} title="Play Audio" />
+    //   {audioPath && <Button title="Upload Audio" onPress={uploadAudio} />}
+    // </View>
+
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
       <Pressable style={[styles.dot, styles.center]}>
-        {recording &&
+        {isRecording &&
           [...Array(3).keys()].map(index => {
             return (
               <MotiView
