@@ -3,7 +3,7 @@ import {Text, TouchableOpacity, StyleSheet} from 'react-native';
 
 const CustomButton = ({buttonTitle = 'submit', buttonStyle = {},textstyle={},...rest}) => {
   return (
-    <TouchableOpacity style={[styles.buttonContainer, buttonStyle]} {...rest}>
+    <TouchableOpacity style={[styles.buttonContainer, buttonStyle]}{...rest}>
       <Text style={[styles.buttonText,textstyle]}>{buttonTitle}</Text>
     </TouchableOpacity>
   );

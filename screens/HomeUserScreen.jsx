@@ -8,18 +8,22 @@ import {useSelector} from 'react-redux';
 export default function HomeUserScreen() {
   const [userdata, setUserdata] = useState([]);
   const {user} = useSelector(state => state.useReducer);
-  
+
   useEffect(()=>{
-    Userdata();
-  },[])
+    if(user!='')
+    {
+       Userdata();
+    }
+  },[user])
 
   const Userdata = async () => {
     try {
+      //console.log("Userid from homescreen:",user);
       const UserRef = doc(db, 'Users', user);
       onSnapshot(UserRef, (doc) => {
         setUserdata(doc.data());
       });
-      console.log(userdata)
+      //console.log(userdata)
     } catch (error) {
       console.log(error);
     }

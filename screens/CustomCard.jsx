@@ -6,7 +6,7 @@ import ConversationModal from './ConversationModal';
 import {db} from '../config';
 import {doc, deleteDoc, updateDoc} from 'firebase/firestore';
 
-import {format} from 'date-fns';
+//import {format} from 'date-fns';
 import {useSelector} from 'react-redux';
 
 export default function CustomCard({
@@ -14,34 +14,36 @@ export default function CustomCard({
   index,
   setModalStates,
   modalStates,
-  setData,
   relativeid,
   relativeName,
   relativeRelation,
-  setImportant
+  setImportant,
 }) {
   const [imp, setImp] = useState(info.Important);
   const {user} = useSelector(state => state.useReducer);
 
   const modalHandler = index => {
+    console.log("index:",index)
     setModalStates(prevStates => {
       const newStates = [...prevStates];
       newStates[index] = !newStates[index];
       return newStates;
     });
   };
+
   useEffect(() => {
     setImp(info.Important);
   }, [info.Important]);
 
   const updateImportant = async id => {
+    console.log("relativeid:",relativeid)
     setImp(!imp);
     const docRef = doc(
       db,
       'Users',
       user,
       'Relatives',
-      relativeid,
+       relativeid,
       'RecordedConversation',
       id
     );
@@ -60,7 +62,7 @@ export default function CustomCard({
         'Relatives',
          docidrelative,
         'RecordedConversation',
-        docid,
+         docid,
       );
       await deleteDoc(conversationRef).then(() => {
         alert('Deleted Data Successfully');
@@ -70,7 +72,7 @@ export default function CustomCard({
       console.log(error);
     }
   };
-
+  //console.log("relativeid from customcard:",relativeid)
   return (
     <View style={styles.cards}>
       <Text style={styles.remaininfo} numberOfLines={2}>
@@ -118,7 +120,7 @@ export default function CustomCard({
         </View>
         <Modal
           visible={modalStates[index]}
-          onRequestClose={() => modalHandler(index)}
+          onRequestClose={() =>modalHandler(index)}
           animationType="fade"
           transparent={true}>
           <ConversationModal

@@ -11,24 +11,30 @@ from io import BytesIO
 from urllib.request import urlopen
 import requests
 from PIL import Image
+from flask_cors import CORS
+
 
 cred=credentials.Certificate("key.json")
 default_app=initialize_app(cred)
 db=firestore.client()
-app=Flask(__name__)
+app = Flask(__name__)
+CORS(app)
 
 def getRelativesImages(userId):
     try:
+      print("Userid",userId)
       userRelationsRef=db.collection('Users').document(userId).collection('Relatives')
       relatives=[doc.to_dict() for doc in userRelationsRef.stream()]
       relativeImages={}
+      print("Relatives",relatives)
       for relative in relatives:
         resp = urlopen(relative['ImageUri'])
         img = numpy.asarray(bytearray(resp.read()), dtype="uint8")
         img = cv2.imdecode(img, cv2.IMREAD_COLOR)
+        print("Relativeid:",relative['Id'],str(relative['Id']))
         relativeImages[str(relative['Id'])]=img
     except Exception as e:
-      return f"An error occured: {e}"
+      return f"Tharun error An error occured: {e}"
     return relativeImages
 
 

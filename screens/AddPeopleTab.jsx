@@ -20,7 +20,7 @@ import {ref, getDownloadURL, uploadBytesResumable} from 'firebase/storage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import CustomInput from '../CustomInput';
-function AddPeopleTab() {
+function AddPeopleTab(props) {
   const {user} = useSelector(state => state.useReducer);
   const [image, setImage] = useState(
     'https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg',
@@ -74,11 +74,13 @@ function AddPeopleTab() {
     const downloadURL = await getDownloadURL(snapshot.ref);
 
     const relativesRef = collection(db, 'Users', user, 'Relatives');
-    await addDoc(relativesRef, {
+    const docdata=await addDoc(relativesRef, {
       Relation: relation,
       RelativeName: name,
       ImageUri: downloadURL,
+      // Id:relativesRef.id,
     }).then(() => {
+      // console.log("New documentid:",docdata)
       setName('');
       setRelation('');
       setImage(

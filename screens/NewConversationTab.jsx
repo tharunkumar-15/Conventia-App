@@ -22,9 +22,10 @@ import {db} from '../config';
 import {collection, addDoc} from 'firebase/firestore';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
+import { useRoute } from '@react-navigation/native';
 import {ref, getDownloadURL, uploadBytesResumable} from 'firebase/storage';
 
-const NewConversationTab = ({navigation}) => {
+const NewConversationTab = ({navigation,props}) => {
   const [audioFile, setAudioFile] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [dropdownValue, setDropdownValue] = useState('true');
@@ -33,7 +34,9 @@ const NewConversationTab = ({navigation}) => {
   const [title, setTitle] = useState('');
   // const [loaded, setLoaded] = useState(false);
   // let sound = null;
-  
+  const route = useRoute();
+  const { relativeid, relativename } = route.params || {};
+
   const [recording, setRecording] = useState(false);
   const {user} = useSelector(state => state.useReducer);
   const animationHandler = () => {
@@ -41,9 +44,13 @@ const NewConversationTab = ({navigation}) => {
   };
   let audiopath="";
   useEffect(() => {
+    console.log("relativeid from new conversation:",relativeid);
+    console.log("relative name from new conversation:",relativename);
     if (recording) start();
     else stop();
   }, [recording]);
+
+  
 
   useEffect(() => {
     const initAudioRecord = async () => {

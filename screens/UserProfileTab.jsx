@@ -149,7 +149,7 @@ function UserProfileTab({navigation}) {
   return (
     <View style={styles.usercontainer}>
        <View style={styles.userdetails}>
-        {userdata.UserImage !== '' ? (
+        {userdata.UserImage != '' ? (
           userdata.UserImage && (
             <TouchableOpacity onPress={() => takePhoto()}>
               <Image
@@ -166,7 +166,6 @@ function UserProfileTab({navigation}) {
             />
           </TouchableOpacity>
         )}
-
         {userdata.Name && (
           <Text style={styles.datacontainer}>Name: {userdata.Name}</Text>
         )}
@@ -185,8 +184,7 @@ function UserProfileTab({navigation}) {
           buttonTitle="Edit Profile"
           onPress={() => modalHandler()}
         />
-
-<Modal
+        <Modal
           visible={modal}
           onRequestClose={() => modalHandler()}
           animationType="fade"

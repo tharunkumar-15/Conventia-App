@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View, ScrollView, Image, Modal} from 'react-native';
+import {StyleSheet, Text, View, ScrollView, Image, Modal,Pressable} from 'react-native';
 import React, {useEffect, useState, useRef} from 'react';
 import {collection, query, where, onSnapshot} from 'firebase/firestore';
 import {db} from '../config';
@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 import CustomCard from './CustomCard';
 import CustomInput from '../CustomInput';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import AntDesign from 'react-native-vector-icons/AntDesign'
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {format} from 'date-fns';
@@ -22,10 +22,10 @@ export default function ImportantTab() {
     Descendingrelativename: false,
     Ascendingrelation: false,
     Descendingrelation: false,
-    Default: true,
+    // Default: true,
   });
   const [relatives, setRelatives] = useState({});
-  const keys = ['Summary', 'SummaryDate'];
+  const keys = ['SummaryTitle', 'SummaryDate'];
   const [importantconversation, setImportantConversation] = useState([]);
   const [filtermodal, setFilterModal] = useState(false);
 
@@ -36,7 +36,12 @@ export default function ImportantTab() {
       for (let i = 0; i < obj.length; i++) {
         res = [...res, ...obj[i]];
       }
-      setImportantConversation(res);
+      let result=res.sort((a, b) =>
+      relatives[`${a.RelativeId}`].name.localeCompare(
+        relatives[`${b.RelativeId}`].name,
+      ),
+    );
+      setImportantConversation(result);
     }
   }, [data]);
 
@@ -49,21 +54,14 @@ export default function ImportantTab() {
     console.log('Relatives fetched', relatives);
   }, [relatives]);
 
-
-  useEffect(()=>{
-    searchfilter()
-  },[searchQuery])
+  useEffect(() => {
+    searchfilter();
+  }, [searchQuery]);
 
   const searchfilter = () => {
     const filteredData = importantData.filter(info =>
       keys.some(key => {
-        const filterKey =
-          key === 'SummaryDate'
-            ? format(
-                new Date(info.SummaryDate.seconds * 1000),
-                'MMM d, yyyy h:mm a',
-              )
-            : info[key];
+        const filterKey = info[key];
         return (
           filterKey &&
           typeof filterKey === 'string' &&
@@ -71,247 +69,276 @@ export default function ImportantTab() {
         );
       }),
     );
-    setImportantData(filteredData);
+    console.log('filtered data:', filteredData);
+    if (searchQuery != '') {
+      setImportantData(filteredData);
+    } else {
+      setImportantData(importantconversation);
+    }
   };
 
-  const defaultdata=()=>{
-    console.log("Defaultdata called");
-    console.log("ImportantData called:",importantconversation);
-    setImportantData(importantconversation);
-    console.log("Inside Defaultdata",importantData)
-    openmodal();
-  }
+  // const defaultdata = () => {
+  //   console.log('Defaultdata called');
+  //   console.log('ImportantData called:', importantconversation);
+  //   setImportantData(importantconversation);
+  //   console.log('Inside Defaultdata', importantData);
+  //   openmodal();
+  // };
 
   const ascendingordername = () => {
-    let result=importantData.sort((a,b)=>relatives[`${a.RelativeId}`].name.localeCompare(relatives[`${b.RelativeId}`].name))
-    setImportantData(result);
-  }
-
-  const descendingordername = () => {
-    let result=importantData.sort((a,b)=>relatives[`${b.RelativeId}`].name.localeCompare(relatives[`${a.RelativeId}`].name))
+    let result = importantData.sort((a, b) =>
+      relatives[`${a.RelativeId}`].name.localeCompare(
+        relatives[`${b.RelativeId}`].name,
+      ),
+    );
     setImportantData(result);
     openmodal()
+  };
+
+  const descendingordername = () => {
+    let result = importantData.sort((a, b) =>
+      relatives[`${b.RelativeId}`].name.localeCompare(
+        relatives[`${a.RelativeId}`].name,
+      ),
+    );
+    setImportantData(result);
+    openmodal();
   };
 
   const ascendingorderrelative = () => {
-    let result=importantData.sort((a,b)=>relatives[`${a.RelativeId}`].relation.localeCompare(relatives[`${b.RelativeId}`].relation))
+    let result = importantData.sort((a, b) =>
+      relatives[`${a.RelativeId}`].relation.localeCompare(
+        relatives[`${b.RelativeId}`].relation,
+      ),
+    );
     setImportantData(result);
-    openmodal()
+    openmodal();
   };
 
   const descendingorderrelative = () => {
-    let result=importantData.sort((a,b)=>relatives[`${b.RelativeId}`].relation.localeCompare(relatives[`${a.RelativeId}`].relation))
+    let result = importantData.sort((a, b) =>
+      relatives[`${b.RelativeId}`].relation.localeCompare(
+        relatives[`${a.RelativeId}`].relation,
+      ),
+    );
     setImportantData(result);
-    openmodal()
+    openmodal();
   };
 
-  // useEffect(() => {
-  //   const relativesRef = collection(db,'Users',user,'Relatives');
-  //   const relativesData = [];
-  //   const unsubscribe = onSnapshot(relativesRef, querySnapshot => {
-  //     querySnapshot.forEach(doc => {
-  //       const relativeInfo = doc.data();
-  //       setRelatives(prev => {
-  //         return {
-  //           ...prev,
-  //           [doc.id]: {
-  //             name: relativeInfo.RelativeName,
-  //             relation: relativeInfo.Relation,
-  //           },
-  //         };
-  //       });
-  //       const importRef = collection(
-  //         db,
-  //         'Users',
-  //         user,
-  //         'Relatives',
-  //         doc.id,
-  //         'RecordedConversation',
-  //       );
-  //       const importQuery = query(importRef, where('Important', '==', true));
+  useEffect(() => {
+    if (user != '') {
+      const relativesRef = collection(db, 'Users', user, 'Relatives');
+      const relativesData = [];
+      const unsubscribe = onSnapshot(relativesRef, querySnapshot => {
+        querySnapshot.forEach(doc => {
+          const relativeInfo = doc.data();
+          setRelatives(prev => {
+            return {
+              ...prev,
+              [doc.id]: {
+                name: relativeInfo.RelativeName,
+                relation: relativeInfo.Relation,
+              },
+            };
+          });
+          const importRef = collection(
+            db,
+            'Users',
+            user,
+            'Relatives',
+            doc.id,
+            'RecordedConversation',
+          );
+          const importQuery = query(importRef, where('Important', '==', true));
 
-  //       onSnapshot(importQuery, importSnapshot => {
-  //         const importData = importSnapshot.docs.map(doc => ({
-  //           id: doc.id,
-  //           ...doc.data(),
-  //         }));
+          onSnapshot(importQuery, importSnapshot => {
+            const importData = importSnapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
 
-  //         relativesData.push(...importData);
-  //         console.log('Important Data:', importData);
-  //         setData(prevData => {
-  //           return {...prevData, [doc.id]: importData};
-  //         });
-  //         setModalStates(new Array(relativesData.length).fill(false));
-  //       });
-  //     });
-  //   });
-  //   return unsubscribe;
-  // }, []);
+            relativesData.push(...importData);
+            console.log('Important Data:', importData);
+            setData(prevData => {
+              return {...prevData, [doc.id]: importData};
+            });
+            setModalStates(new Array(relativesData.length).fill(false));
+          });
+        });
+      });
+      return unsubscribe;
+    }
+  }, [user]);
 
   const openmodal = () => {
+    console.log('modal is opening wait');
     setFilterModal(!filtermodal);
   };
 
   return (
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{alignItems: 'center'}}
-        style={styles.scrollcontainer}>
-        <View style={styles.filtercontainer}>
-          <View style={styles.searchcontainer}>
-            <CustomInput
-              placeholderText="Search"
-              autoCapitalize="none"
-              autoCorrect={false}
-              Icon={FontAwesome}
-              Icontype="search"
-              onChangeText={text => setSearchQuery(text)}
-              value={searchQuery}
-            />
-          </View>
-          <View style={styles.filtericon}>
-            <TouchableOpacity onPress={() => openmodal()}>
-              <Image
-                source={require('../filter.png')}
-                style={styles.Icon}
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{alignItems: 'center'}}
+      style={styles.scrollcontainer}>
+      <View style={styles.filtercontainer}>
+        <View style={styles.searchcontainer}>
+          <CustomInput
+            placeholderText="Search"
+            autoCapitalize="none"
+            autoCorrect={false}
+            Icon={FontAwesome}
+            Icontype="search"
+            onChangeText={text => setSearchQuery(text)}
+            value={searchQuery}
+          />
+        </View>
+        {/* <Button onPress={openmodal} title='hii'></Button> */}
+        <View style={styles.filtericon} onPress={openmodal}>
+          <Pressable onPress={openmodal}>
+            <Image source={require('../filter.png')} style={styles.Icon} />
+          </Pressable>
+        </View>
+        <Modal
+          visible={filtermodal}
+          onRequestClose={() => openmodal()}
+          animationType="fade"
+          transparent={true}>
+          <View style={[styles.modalstyle, {justifyContent: 'flex-end'}]}>
+            <View style={styles.modalbackground}>
+              <Entypo
+                size={35}
+                color={'black'}
+                name="cross"
+                onPress={() => openmodal()}
+                style={styles.cross}
               />
-            </TouchableOpacity>
-          </View>
-          <Modal
-            visible={filtermodal}
-            onRequestClose={() => openmodal()}
-            animationType="fade"
-            transparent={true}>
-            <View style={[styles.modalstyle, {justifyContent: 'flex-end'}]}>
-              <View style={styles.modalbackground}>
-                <Entypo
-                  size={35}
-                  color={'black'}
-                  name="cross"
-                  onPress={() => openmodal()}
-                  style={styles.cross}
-                />
-              <View style={styles.selectedicon}>
+              {/* <View style={styles.selectedicon}>
                 <Text
                   style={styles.filtertext}
                   onPress={() => {
-                      defaultdata();
-                      setFilterselected({
-                        Ascendingrelation: false,
-                        Ascendingrelativename: false,
-                        Descendingrelation: false,
-                        Descendingrelativename: false,
-                        Default: true,
-                      });
+                    defaultdata();
+                    setFilterselected({
+                      Ascendingrelation: false,
+                      Ascendingrelativename: false,
+                      Descendingrelation: false,
+                      Descendingrelativename: false,
+                      Default: true,
+                    });
                   }}>
                   Default
                 </Text>
-                {filterselected.Default &&<AntDesign
-                  style={styles.selecticon}
-                  size={22}
-                  name="checkcircle"
-                  color="green"
-                />}
-              </View>
+                {filterselected.Default && (
+                  <AntDesign
+                    style={styles.selecticon}
+                    size={22}
+                    name="checkcircle"
+                    color="green"
+                  />
+                )}
+              </View> */}
               <View style={styles.selectedicon}>
                 <Text
                   style={styles.filtertext}
                   onPress={() => {
-                      ascendingordername(),
+                    ascendingordername(),
                       setFilterselected({
                         Ascendingrelation: false,
                         Ascendingrelativename: true,
                         Descendingrelation: false,
                         Descendingrelativename: false,
-                        Default: false,
+                        //Default: false,
                       });
                   }}>
                   Ascending Order based on relativename
                 </Text>
-                {filterselected.Ascendingrelativename &&<AntDesign
-                  style={styles.selecticon}
-                  size={22}
-                  name="checkcircle"
-                  color="green"
-                />}
-              </View>
-              <View style={styles.selectedicon}>
-                <Text
-                  style={ styles.filtertext}
-                  onPress={() => {
-                    descendingordername()
-                    setFilterselected({
-                      Ascendingrelation: false,
-                      Ascendingrelativename: false,
-                      Descendingrelation: false,
-                      Descendingrelativename: true,
-                      Default: false,
-                    });
-                  }}>
-                  Descending Order based on relativename
-                </Text>
-                {filterselected.Descendingrelativename&&<AntDesign
-                  style={styles.selecticon}
-                  size={22}
-                  name="checkcircle"
-                  color="green"
-                />
-              }
+                {filterselected.Ascendingrelativename && (
+                  <AntDesign
+                    style={styles.selecticon}
+                    size={22}
+                    name="checkcircle"
+                    color="green"
+                  />
+                )}
               </View>
               <View style={styles.selectedicon}>
                 <Text
                   style={styles.filtertext}
                   onPress={() => {
-                    ascendingorderrelative()
+                    descendingordername();
+                    setFilterselected({
+                      Ascendingrelation: false,
+                      Ascendingrelativename: false,
+                      Descendingrelation: false,
+                      Descendingrelativename: true,
+                      //Default: false,
+                    });
+                  }}>
+                  Descending Order based on relativename
+                </Text>
+                {filterselected.Descendingrelativename && (
+                  <AntDesign
+                    style={styles.selecticon}
+                    size={22}
+                    name="checkcircle"
+                    color="green"
+                  />
+                )}
+              </View>
+              <View style={styles.selectedicon}>
+                <Text
+                  style={styles.filtertext}
+                  onPress={() => {
+                    ascendingorderrelative();
                     setFilterselected({
                       Ascendingrelation: true,
                       Ascendingrelativename: false,
                       Descendingrelation: false,
                       Descendingrelativename: false,
-                      Default: false,
+                      //Default: false,
                     });
                   }}>
                   Ascendig Order based on relation
                 </Text>
-                {filterselected.Ascendingrelation&&<AntDesign
-                  style={styles.selecticon}
-                  size={22}
-                  name="checkcircle"
-                  color="green"
-                />
-                }
+                {filterselected.Ascendingrelation && (
+                  <AntDesign
+                    style={styles.selecticon}
+                    size={22}
+                    name="checkcircle"
+                    color="green"
+                  />
+                )}
               </View>
               <View style={styles.selectedicon}>
                 <Text
-                  style={ styles.filtertext}
+                  style={styles.filtertext}
                   onPress={() => {
-                    descendingorderrelative()
+                    descendingorderrelative();
                     setFilterselected({
                       Ascendingrelation: false,
                       Ascendingrelativename: false,
                       Descendingrelation: true,
                       Descendingrelativename: false,
-                      Default: false,
+                      //Default: false,
                     });
                   }}>
                   Descending Order based on relation
                 </Text>
-                {filterselected.Descendingrelation &&<AntDesign
-                  style={styles.selecticon}
-                  size={22}
-                  name="checkcircle"
-                  color="green"
-                />}
-              </View>
+                {filterselected.Descendingrelation && (
+                  <AntDesign
+                    style={styles.selecticon}
+                    size={22}
+                    name="checkcircle"
+                    color="green"
+                  />
+                )}
               </View>
             </View>
-          </Modal>
-        </View>
-        {importantData &&
-          importantData.map((infodata, index) => {
-            console.log("Suhas:",importantconversation)
-            console.log("Surya:",importantData)
-            return(
+          </View>
+        </Modal>
+      </View>
+      {importantData && importantData.length > 0 ? (
+        importantData.map((infodata, index) => {
+          return (
             <View key={index} style={styles.cardstyle}>
               <CustomCard
                 info={infodata}
@@ -325,9 +352,12 @@ export default function ImportantTab() {
                 setImportant={setImportantData}
               />
             </View>
-          )
-      })}
-      </ScrollView>
+          );
+        })
+      ) : (
+        <Text style={styles.nodatatext}>No results found</Text>
+      )}
+    </ScrollView>
   );
 }
 const styles = StyleSheet.create({
@@ -335,7 +365,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     backgroundColor: 'white',
-    marginTop:30,
+    marginTop: 30,
   },
   Tabtext: {
     fontSize: 25,
@@ -406,13 +436,18 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
     marginTop: 10,
   },
-  selectedicon:{
-    flex:2,
-    flexDirection:'row',
-    justifyContent:'space-between',
-    padding:8,
+  selectedicon: {
+    flex: 2,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 8,
   },
-  selecticon:{
-    marginLeft:7,
-  }
+  selecticon: {
+    marginLeft: 7,
+  },
+  nodatatext: {
+    fontSize: 20,
+    color: 'black',
+    fontWeight: 'bold',
+  },
 });

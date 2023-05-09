@@ -50,6 +50,7 @@ from urllib.request import urlopen
 
 def predictFace(image,images={}):
   encodeListKnown=[]
+  print("Images:",images)
   classNames = list(images.keys())
   for img in images.values():
     img=cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
@@ -64,7 +65,7 @@ def predictFace(image,images={}):
   matchIndex=np.argmin(faceDis)
 
   if faceDis[matchIndex]< 0.50:
-    name = classNames[matchIndex].upper()
+    name = classNames[matchIndex]
   else: name = 'Unknown'
-
+  
   return name
