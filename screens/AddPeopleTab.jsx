@@ -50,7 +50,7 @@ function AddPeopleTab() {
   
   useEffect(() => {
     console.log("called from id");
-    if (docId!='' && docId!=docId) {
+    if (docId!='') {
       const relativesRef = collection(db, 'Users', user, 'Relatives');
       const docRef = doc(relativesRef, docId);
       updateDoc(docRef, {
@@ -61,8 +61,8 @@ function AddPeopleTab() {
   
 
   const senddata = async () => {
-    dispatch(setSnapShot(false));
-    console.log("Snapshotvariable inside senddata:",snapshotvariable)
+    // dispatch(setSnapShot(false));
+    // console.log("Snapshotvariable inside senddata:",snapshotvariable)
     setShowloader(true);
     console.log('upload function called');
     const blobImage = await new Promise((resolve, reject) => {

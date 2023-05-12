@@ -14,7 +14,7 @@ def startDiarization(url,UserName,RelativeName):
                            use_auth_token="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")
     
     audio_url=url
-    audio_path = 'D:/DownloadedFiles/audio'
+    audio_path = 'D:/DownloadedFiles/audio.mp3'
     urllib.request.urlretrieve(audio_url, audio_path)
     # convert audio file to WAV format using pydub
     audio = AudioSegment.from_file(audio_path)

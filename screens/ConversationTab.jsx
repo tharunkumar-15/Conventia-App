@@ -85,9 +85,9 @@ function ConversationTab({navigation}) {
                 <Text style={styles.relativedetails}>
                   Relation: {cards.Relation}
                 </Text>
-                <Text style={styles.relativedetails}>
+                {/* <Text style={styles.relativedetails}>
                   Relationid: {cards.id}
-                </Text>
+                </Text> */}
                 <View style={styles.deleteiconandmoreinfo}>
                 <CustomButton
                 buttonTitle="More Info"

@@ -10,7 +10,7 @@ function useReducer(state = initialState, action) {
       case SET_USER:
         return { ...state, user: action.payload };
       case SET_SNAPSHOT:
-        return { ...state, snapshotvariable: !state.snapshotvariable };
+        return { ...state, snapshotvariable:  action.payload};
       default:
         return state;
     }

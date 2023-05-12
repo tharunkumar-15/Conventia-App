@@ -1,0 +1,170 @@
+import {StyleSheet, Text, View, Modal,TouchableOpacity} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import CustomButton from '../CustomButton';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import ConversationModal from './ConversationModal';
+import {db} from '../config';
+import {doc, deleteDoc, updateDoc} from 'firebase/firestore';
+
+//import {format} from 'date-fns';
+import {useSelector} from 'react-redux';
+
+export default function CustomModel({
+  info,
+  index,
+  setModalStates,
+  modalStates,
+  relativeid,
+  relativeName,
+  relativeRelation,
+  setImportant,
+}) {
+  const [imp, setImp] = useState(info.Important);
+  const {user} = useSelector(state => state.useReducer);
+  const [open, setOpen] = useState(false);
+
+  const modalHandler = index => {
+    console.log("index:",index)
+    setModalStates(prevStates => {
+      const newStates = [...prevStates];
+      newStates[index] = !newStates[index];
+      return newStates;
+    });
+  };
+
+  useEffect(() => {
+    setImp(info.Important);
+  }, [info.Important]);
+
+  const updateImportant = async id => {
+    console.log("relativeid:",relativeid)
+    setImp(!imp);
+    const docRef = doc(
+      db,
+      'Users',
+      user,
+      'Relatives',
+       relativeid,
+      'RecordedConversation',
+      id
+    );
+    await updateDoc(docRef, {
+      Important: !imp,
+    });
+  };
+
+  
+  const deleterelative = async (docid,docidrelative) => {
+    try {
+      const conversationRef = doc(
+        db,
+        'Users',
+        user,
+        'Relatives',
+         docidrelative,
+        'RecordedConversation',
+         docid,
+      );
+      await deleteDoc(conversationRef).then(() => {
+        alert('Deleted Data Successfully');
+        setImportant(prevData => prevData.filter(item => item.id !== docid));
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  //console.log("relativeid from customcard:",relativeid)
+  return (
+    <View style={styles.cards}>
+      <Text style={styles.remaininfo} numberOfLines={2}>
+          <Text>
+          {info.SummaryDate&&info.SummaryDate}
+            :{info.SummaryTitle}
+          </Text>
+      </Text>
+      <Text style={styles.remaininfo} numberOfLines={2}>
+        {relativeName&&relativeName}
+      </Text>
+      <Text style={styles.remaininfo} numberOfLines={2}>
+        {relativeRelation&&relativeRelation}
+      </Text>
+      <View style={styles.logostyle}>
+        <AntDesign
+          size={25}
+          color={'white'}
+          name="delete"
+          style={{marginTop: 15}}
+          onPress={() => deleterelative(info.id,relativeid)}
+        />
+       <TouchableOpacity
+          onPress={() => updateImportant(info.id)}
+          activeOpacity={0.7}
+        >
+          {info.Important ? (
+            <AntDesign name="star" size={25} color="gold" style={styles.staricon}/>
+          ) : (
+            <AntDesign name="staro" size={20} color="white" style={styles.staricon}/>
+          )}
+        </TouchableOpacity>
+        <View style={styles.buttonstyles}>
+          <CustomButton
+            buttonTitle="More Info"
+            buttonStyle={{
+              width: '65%',
+              backgroundColor: '#f95999',
+            }}
+            textstyle={{
+              fontSize: 15,
+            }}
+            onPress={() => setOpen(!open)}
+          />
+        </View>
+        <Modal
+          visible={open}
+          onRequestClose={() => setOpen(!open)}
+          animationType="fade"
+          transparent={true}>
+          <ConversationModal
+            conversation={info.Summary}
+            modalhandler={() => setOpen(!open)}
+          />
+        </Modal>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  cards: {
+    backgroundColor: '#51087E',
+    width: '90%',
+    padding: 18,
+    marginBottom: 20,
+    borderRadius: 10,
+    margin: 5,
+    marginRight: 10,
+  },
+  remaininfo: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 15,
+  },
+  logostyle: {
+    flexDirection: 'row',
+  },
+  buttonstyles: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginLeft: 20,
+  },
+  staricon:{
+    marginLeft:18,
+    marginTop:15,
+  },
+  relationinfo:{
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 20,
+    textAlign:'center'
+  }
+});

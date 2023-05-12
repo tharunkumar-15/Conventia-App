@@ -7,6 +7,7 @@ import {
 } from 'firebase/firestore';
 import {useSelector} from 'react-redux';
 import CustomCard from './CustomCard';
+import CustomModel from './CustomModel';
 
 function PreviousConverstionTab(props) {
   //const [icon, seticon] = useState(false);
@@ -35,7 +36,7 @@ const ReadData = async () => {
         id: conversationDoc.id,
       }));
       setData(conversationsData);
-      setModalStates(new Array(data.length).fill(false));
+      setModalStates(new Array(conversationsData.length).fill(false));
     } catch (error) {
       console.log('Tharun', error);
     }
@@ -59,7 +60,7 @@ const ReadData = async () => {
         <View style={styles.recordingdetails}>
           {data.map((info, index) => (
             <View key={index} style={styles.cardstyle}>
-            <CustomCard info={info} modalStates={modalStates} setModalStates={setModalStates} index={index} setData={setData} relativeid={id} setImportant={setData}/>
+            <CustomModel info={info} modalStates={modalStates} setModalStates={setModalStates} index={index} setData={setData} relativeid={id} setImportant={setData}/>
           </View>
           ))}
         </View>
