@@ -1,19 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, Image, ScrollView, Modal} from 'react-native';
-import CustomButton from '../CustomButton';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import ConversationModal from './ConversationModal';
 import {db} from '../config';
 import {
-  doc,
   collection,
   getDocs,
-  deleteDoc,
-  updateDoc,
 } from 'firebase/firestore';
 import {useSelector} from 'react-redux';
 import CustomCard from './CustomCard';
-//import {format} from 'date-fns';
 
 function PreviousConverstionTab(props) {
   //const [icon, seticon] = useState(false);
@@ -26,7 +19,7 @@ function PreviousConverstionTab(props) {
     ReadData();
   }, [data]);
 
-  const ReadData = async () => {
+const ReadData = async () => {
     try {
       const conversationsRef = collection(
         db,
@@ -46,8 +39,7 @@ function PreviousConverstionTab(props) {
     } catch (error) {
       console.log('Tharun', error);
     }
-  };
-  
+};
 
   return (
     <View style={styles.usercontainer}>
@@ -59,8 +51,8 @@ function PreviousConverstionTab(props) {
              style={styles.relativeimage}
           />
           <View style={styles.rightdetails}>
-            <Text style={styles.details}>Name: {RelativeName}</Text>
-            <Text style={styles.details}>Relation: {Relation}</Text>
+            <Text style={styles.details}>Name:{RelativeName}</Text>
+            <Text style={styles.details}>Relation:{Relation}</Text>
           </View>
         </View>
         <Text style={styles.details}>Recordings</Text>

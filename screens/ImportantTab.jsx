@@ -47,11 +47,11 @@ export default function ImportantTab() {
 
   useEffect(() => {
     setImportantData(importantconversation);
-    console.log('Data for filter:', importantData);
+    //console.log('Data for filter:', importantData);
   }, [importantconversation]);
 
   useEffect(() => {
-    console.log('Relatives fetched', relatives);
+    //console.log('Relatives fetched', relatives);
   }, [relatives]);
 
   useEffect(() => {
@@ -130,41 +130,40 @@ export default function ImportantTab() {
       const relativesRef = collection(db, 'Users', user, 'Relatives');
       const relativesData = [];
       const unsubscribe = onSnapshot(relativesRef, querySnapshot => {
-        querySnapshot.forEach(doc => {
-          const relativeInfo = doc.data();
-          setRelatives(prev => {
-            return {
-              ...prev,
-              [doc.id]: {
-                name: relativeInfo.RelativeName,
-                relation: relativeInfo.Relation,
-              },
-            };
-          });
-          const importRef = collection(
-            db,
-            'Users',
-            user,
-            'Relatives',
-            doc.id,
-            'RecordedConversation',
-          );
-          const importQuery = query(importRef, where('Important', '==', true));
+        // querySnapshot.forEach(doc => {
+        //   const relativeInfo = doc.data();
+        //   setRelatives(prev => {
+        //     return {
+        //       ...prev,
+        //       [doc.id]: {
+        //         name: relativeInfo.RelativeName,
+        //         relation: relativeInfo.Relation,
+        //       },
+        //     };
+        //   });
+        //   const importRef = collection(
+        //     db,
+        //     'Users',
+        //     user,
+        //     'Relatives',
+        //     doc.id,
+        //     'RecordedConversation',
+        //   );
+        //   const importQuery = query(importRef, where('Important', '==', true));
+        //   onSnapshot(importQuery, importSnapshot => {
+        //     const importData = importSnapshot.docs.map(doc => ({
+        //       id: doc.id,
+        //       ...doc.data(),
+        //     }));
 
-          onSnapshot(importQuery, importSnapshot => {
-            const importData = importSnapshot.docs.map(doc => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
-
-            relativesData.push(...importData);
-            console.log('Important Data:', importData);
-            setData(prevData => {
-              return {...prevData, [doc.id]: importData};
-            });
-            setModalStates(new Array(relativesData.length).fill(false));
-          });
-        });
+        //     relativesData.push(...importData);
+        //     //console.log('Important Data:', importData);
+        //     setData(prevData => {
+        //       return {...prevData, [doc.id]: importData};
+        //     });
+        //     setModalStates(new Array(relativesData.length).fill(false));
+        //   });
+        // });
       });
       return unsubscribe;
     }

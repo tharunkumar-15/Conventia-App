@@ -149,8 +149,7 @@ function UserProfileTab({navigation}) {
   return (
     <View style={styles.usercontainer}>
        <View style={styles.userdetails}>
-        {userdata.UserImage != '' ? (
-          userdata.UserImage && (
+        {userdata.UserImage &&userdata.UserImage != '' ? ((
             <TouchableOpacity onPress={() => takePhoto()}>
               <Image
                 source={{uri: userdata.UserImage}}

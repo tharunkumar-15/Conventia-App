@@ -1,5 +1,5 @@
 import {Image} from '@motify/components';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -13,24 +13,27 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CustomButton from '../CustomButton';
 import {auth, db, storage} from '../config';
-import {collection, addDoc} from 'firebase/firestore';
+import {collection, addDoc, updateDoc,doc} from 'firebase/firestore';
 import ImagePicker from 'react-native-image-crop-picker';
-import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
+import {setSnapShot} from '../Redux/Actions';
 import {ref, getDownloadURL, uploadBytesResumable} from 'firebase/storage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import CustomInput from '../CustomInput';
-function AddPeopleTab(props) {
+function AddPeopleTab() {
   const {user} = useSelector(state => state.useReducer);
+  const {snapshotvariable} = useSelector(state => state.useReducer);
   const [image, setImage] = useState(
     'https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg',
   );
   const [name, setName] = useState('');
   const [relation, setRelation] = useState('');
   const [showloader, setShowloader] = useState(false);
-
-
+  const dispatch = useDispatch();
+  const [docId,setDocId]=useState('');
   function takePhoto() {
+    console.log('snapshot:', snapshotvariable);
     ImagePicker.openCamera({
       width: 300,
       height: 400,
@@ -44,8 +47,22 @@ function AddPeopleTab(props) {
         console.log('Error taking photo:', error);
       });
   }
+  
+  useEffect(() => {
+    console.log("called from id");
+    if (docId!='' && docId!=docId) {
+      const relativesRef = collection(db, 'Users', user, 'Relatives');
+      const docRef = doc(relativesRef, docId);
+      updateDoc(docRef, {
+        Id: docId, // Add a field called "Id" with the document ID
+      });
+    }
+  }, [docId]);
+  
 
   const senddata = async () => {
+    dispatch(setSnapShot(false));
+    console.log("Snapshotvariable inside senddata:",snapshotvariable)
     setShowloader(true);
     console.log('upload function called');
     const blobImage = await new Promise((resolve, reject) => {
@@ -72,26 +89,48 @@ function AddPeopleTab(props) {
       metadata,
     );
     const downloadURL = await getDownloadURL(snapshot.ref);
-
+    //console.log('snapshot after setting:', snapshotvariable);
     const relativesRef = collection(db, 'Users', user, 'Relatives');
-    const docdata=await addDoc(relativesRef, {
+    const document = await addDoc(relativesRef, {
       Relation: relation,
       RelativeName: name,
       ImageUri: downloadURL,
-      // Id:relativesRef.id,
-    }).then(() => {
-      // console.log("New documentid:",docdata)
-      setName('');
-      setRelation('');
-      setImage(
-        'https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg',
-      );
-      setShowloader(false);
-      ToastAndroid.show('Relative Added',ToastAndroid.SHORT,ToastAndroid.BOTTOM)
     });
-
+    setDocId(document.id)
+    setName('');
+    setRelation('');
+    setImage(
+      'https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg',
+    );
+    setShowloader(false);
+    ToastAndroid.show(
+      'Relative Added',
+      ToastAndroid.SHORT,
+      ToastAndroid.BOTTOM,
+    );
     console.log('downloadURL', downloadURL);
   };
+  //   const relativesRef = collection(db, 'Users', user, 'Relatives');
+  //   const newDocRef = await addDoc(relativesRef, {
+  //     Relation: relation,
+  //     RelativeName: name,
+  //     ImageUri: downloadURL,
+  //   }).then(() => {
+  //    setName('');
+  //    setRelation('');
+  //    setImage(
+  //      'https://i.pinimg.com/736x/8b/16/7a/8b167af653c2399dd93b952a48740620.jpg',
+  //    );
+  //  });
+
+  //  const docId = newDocRef.id;
+  //  await updateDoc(newDocRef, { Id: docId });
+  //  console.log('Document created with ID:', docId);
+  //  console.log('downloadURL', downloadURL);
+
+  //  setShowloader(false);
+  //  ToastAndroid.show('Relative Added',ToastAndroid.SHORT,ToastAndroid.BOTTOM);
+  // };
 
   return (
     <View style={styles.usercontainer}>
@@ -113,8 +152,8 @@ function AddPeopleTab(props) {
             />
           </Pressable>
         </View>
-      <View style={styles.inputtextstyle}>
-        <CustomInput
+        <View style={styles.inputtextstyle}>
+          <CustomInput
             placeholderText={'Name'}
             autoCapitalize="none"
             autoCorrect={false}
@@ -136,10 +175,8 @@ function AddPeopleTab(props) {
             Icon={MaterialCommunityIcons}
             Icontype={'relation-one-to-one'}
           />
-        <CustomButton
-          onPress={() => senddata()}
-        />
-      </View>
+          <CustomButton onPress={() => senddata()} />
+        </View>
       </ScrollView>
       {showloader && (
         <View style={styles.loading}>
@@ -191,9 +228,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   inputtextstyle: {
-    flex:1,
-    justifyContent:'center',
-    alignItems:'center',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     margin: 10,
     padding: 20,
     borderRadius: 10,
@@ -225,11 +262,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  tabtitle:{
-    fontSize:22,
-    color:'black',
-    fontWeight:'bold',
-    textAlign:'center',
-    marginTop:20,
-  }
+  tabtitle: {
+    fontSize: 22,
+    color: 'black',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 20,
+  },
 });

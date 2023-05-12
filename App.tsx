@@ -33,17 +33,6 @@ function App() {
               headerShown: false,
             }}
           />
-          <Stack.Screen name="CameraResultTab" component={CameraResultTab} />
-          <Stack.Screen
-            name="NewConversationTab"
-            component={NewConversationTab}
-          />
-          <Stack.Screen
-            name="PreviousConverstionTab"
-            component={PreviousConverstionTab}
-          />
-          <Stack.Screen name="UserProfileTab" component={UserProfileTab} />
-          <Stack.Screen name="UserPage" component={Tabs} />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

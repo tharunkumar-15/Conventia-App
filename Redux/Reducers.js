@@ -1,16 +1,19 @@
 import {SET_USER} from './Actions'
-
+import {SET_SNAPSHOT} from './Actions'
 const initialState={
-    user:'',  
+    user:'', 
+    snapshotvariable:true
 }
 
-function useReducer(state=initialState,action){
-    switch(action.type){
-        case SET_USER:
-            return {...state,user:action.payload}
-        default:
-            return state;
+function useReducer(state = initialState, action) {
+    switch (action.type) {
+      case SET_USER:
+        return { ...state, user: action.payload };
+      case SET_SNAPSHOT:
+        return { ...state, snapshotvariable: !state.snapshotvariable };
+      default:
+        return state;
     }
-}
+}  
 
 export default useReducer;
